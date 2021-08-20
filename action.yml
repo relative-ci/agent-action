@@ -10,10 +10,22 @@ inputs:
   slug:
     description: 'RelativeCI project slug'
     required: false
+  debug:
+    description: 'Output debug info'
+    required: false
 runs:
   using: "composite"
   steps:
     - run: cp ${{ inputs.webpackStatsFile }} relative-ci--webpack-stats.json
+      shell: bash
+
+    - id: set-debug
+      name: Set DEBUG environment variable
+      env:
+        INPUT_DEBUG: ${{ inputs.debug }}
+      run: |
+        RELATIVE_CI_DEBUG=$([ -z ${INPUT_DEBUG} ] && echo "" || echo "relative-ci:agent")
+        echo "::set-output name=debug::${RELATIVE_CI_DEBUG}"
       shell: bash
 
     - run: npx relative-ci-agent
@@ -21,3 +33,4 @@ runs:
       env:
         RELATIVE_CI_KEY: ${{ inputs.key }}
         RELATIVE_CI_SLUG: ${{ inputs.slug }}
+        DEBUG: ${{ steps.set-debug.outputs.debug }}
