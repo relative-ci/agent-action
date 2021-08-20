@@ -1,0 +1,10 @@
+.root {}
+
+.item {
+  display: block;
+  max-width: 1024px;
+}
+
+.item + .item {
+  margin-top: 16px;
+}
