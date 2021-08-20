@@ -1,0 +1,49 @@
+name: Example
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Cache node modules
+        uses: actions/cache@v1
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm # npm cache files are stored in `~/.npm` on Linux/macOS
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - uses: hmarr/debug-action@v2
+
+      # - uses: mxschmitt/action-tmate@v3
+
+      - name: Install npm dependencies
+        run: npm ci --prefix ./example
+
+      - name: Build application
+        run: npm run build --if-present --prefix ./example
+
+      - name: Send webpack stats to RelativeCI
+        uses: ./
+        with:
+          webpackStatsFile: ./example/artifacts/webpack-stats.json
+          key: ${{ secrets.RELATIVE_CI_KEY }}
+          slug: ${{ secrets.RELATIVE_CI_SLUG }} 
+          debug: true

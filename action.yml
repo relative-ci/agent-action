@@ -16,6 +16,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: hmarr/debug-action@v2
+
     - run: cp ${{ inputs.webpackStatsFile }} relative-ci--webpack-stats.json
       shell: bash
 
