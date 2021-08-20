@@ -1,0 +1,35 @@
+{
+  "name": "@relative-ci/agent-action",
+  "version": "1.0.0-alpha.0",
+  "description": "Send webpack stats to RelativeCI",
+  "repository": "relative-ci/agent-action",
+  "engines": {
+    "node": ">= 12.0"
+  },
+  "keywords": [
+    "github-action",
+    "webpack",
+    "bundle-size",
+    "bundle-analyzer",
+    "bundle-stats",
+    "stats",
+    "bundle",
+    "size",
+    "assets",
+    "chunks",
+    "modules"
+  ],
+  "author": {
+    "name": "Viorel Cojocaru",
+    "email": "vio@beanon.com",
+    "url": "http://beanon.com"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/relative-ci/agent-action/issues"
+  },
+  "homepage": "https://relative-ci.com/documentation/setup",
+  "dependencies": {
+    "@relative-ci/agent": "^2.1.0"
+  }
+}

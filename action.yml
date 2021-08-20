@@ -1,0 +1,19 @@
+name: 'RelativeCI agent action'
+description: 'Send webpack stats and CI build information to RelativeCI'
+inputs:
+  webpackStatsFile:
+    description: 'Path to your local webpack stats file'
+    required: true
+  key:
+    description: 'RelativeCI project key'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - run: cp ${{ inputs.webpackStatsFile }} relative-ci--webpack-stats.json
+      shell: bash
+
+    - run: npx relative-ci-agent
+      shell: bash
+      env:
+        RELATIVE_CI_KEY: ${{ inputs.key }}
