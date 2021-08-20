@@ -1,0 +1,9 @@
+<a href="https://relative-ci.com">
+<img alt="RelativeCI" src="https://raw.githubusercontent.com/relative-ci/agent-action/master/assets/relative-ci--logo.svg?sanitize=true" width="96" />
+</a>
+
+# RelativeCI agent Github Action
+
+> Send webpack stats and CI build information to [RelativeCI](https://relative-ci.com?utm_source=github-agent).
+
+To get started, follow [RelativeCI Setup guide](https://relative-ci.com/documentation/setup?utm_source=github-agent-action).
