@@ -7,6 +7,9 @@ inputs:
   key:
     description: 'RelativeCI project key'
     required: true
+  slug:
+    description: 'RelativeCI project slug'
+    required: false
 runs:
   using: "composite"
   steps:
@@ -17,3 +20,4 @@ runs:
       shell: bash
       env:
         RELATIVE_CI_KEY: ${{ inputs.key }}
+        RELATIVE_CI_SLUG: ${{ inputs.slug }}
