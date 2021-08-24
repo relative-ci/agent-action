@@ -1,5 +1,8 @@
 name: 'RelativeCI agent action'
 description: 'Send webpack stats and CI build information to RelativeCI'
+branding:
+  icon: 'box'
+  color: 'blue'
 inputs:
   webpackStatsFile:
     description: 'Path to your local webpack stats file'
