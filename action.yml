@@ -16,7 +16,8 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - run: cp ${{ inputs.webpackStatsFile }} relative-ci--webpack-stats.json
+    - name: Copy webpack stats file
+      run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
       shell: bash
 
     - id: set-debug
@@ -28,7 +29,7 @@ runs:
         echo "::set-output name=debug::${RELATIVE_CI_DEBUG}"
       shell: bash
 
-    - run: npx relative-ci-agent
+    - run: cd ${{ github.action_path }} && ./node_modules/@relative-ci/agent/bin/index.js
       shell: bash
       env:
         RELATIVE_CI_KEY: ${{ inputs.key }}
