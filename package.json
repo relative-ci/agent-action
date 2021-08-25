@@ -1,7 +1,7 @@
 {
   "name": "@relative-ci/agent-action",
   "version": "1.0.1",
-  "description": "Send webpack stats to RelativeCI",
+  "description": "GitHub action that sends webpack stats and build information to RelativeCI",
   "repository": "relative-ci/agent-action",
   "engines": {
     "node": ">= 12.0"

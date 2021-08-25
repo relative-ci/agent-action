@@ -1,6 +1,6 @@
 # RelativeCI agent
 
-> GitHub action that sends webpack stats and CI build information to [RelativeCI](https://relative-ci.com?utm_source=GitHub&utm_medium=agent-action).
+GitHub action that sends webpack stats and CI build information to [RelativeCI](https://relative-ci.com?utm_source=GitHub&utm_medium=agent-action).
 
 ---
 
