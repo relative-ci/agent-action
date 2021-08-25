@@ -1,4 +1,4 @@
-name: 'RelativeCI agent action'
+name: 'RelativeCI agent'
 description: 'Send webpack stats and CI build information to RelativeCI'
 branding:
   icon: 'box'
