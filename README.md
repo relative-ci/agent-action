@@ -47,3 +47,9 @@ Your project slug (default: [`GITHUB_REPOSITORY` evironment variable](https://do
 ### `debug`
 
 Enable debug output (default: `false`)
+
+## Secrets
+
+### `RELATIVE_CI_KEY`
+
+Your RelativeCI project key
