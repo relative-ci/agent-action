@@ -32,9 +32,46 @@ runs:
         echo "::set-output name=debug::${RELATIVE_CI_DEBUG}"
       shell: bash
 
-    - run: cd ${{ github.action_path }} && ./node_modules/@relative-ci/agent/bin/index.js
+    # Get commit message for cases where the build is triggered by a different commit
+    # eg: pull_request
+    - uses: actions/github-script@v4
+      id: event-commit-message
+      with:
+        script: |
+          if (context.eventName !== "pull_request") {
+            return "";
+          }
+
+          let commitMessage;
+
+          try {
+            const res = await github.repos.getCommit({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha,
+            });
+
+            commitMessage = res.data.commit.message;
+          } catch (_) {
+            // noop
+          }
+
+          return commitMessage;
+
+        result-encoding: string
+
+    - run: |
+        # Go to action directory
+        cd ${{ github.action_path }}
+
+        # Run @relative-ci/agent cli
+        ./node_modules/@relative-ci/agent/bin/index.js --commit $COMMIT --branch $BRANCH --pr $PR --commit-message "${COMMIT_MESSAGE}"
       shell: bash
       env:
         RELATIVE_CI_KEY: ${{ inputs.key }}
         RELATIVE_CI_SLUG: ${{ inputs.slug }}
         DEBUG: ${{ steps.set-debug.outputs.debug }}
+        COMMIT: ${{ github.event.pull_request.head.sha }}
+        COMMIT_MESSAGE: ${{ steps.event-commit-message.outputs.result }}
+        BRANCH: ${{ github.event.pull_request.head.ref }}
+        PR: ${{ github.event.pull_request.number }}
