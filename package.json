@@ -1,7 +1,7 @@
 {
   "name": "@relative-ci/agent-action",
-  "version": "1.0.0-alpha.0",
-  "description": "Send webpack stats to RelativeCI",
+  "version": "1.0.2",
+  "description": "GitHub action that sends webpack stats and build information to RelativeCI",
   "repository": "relative-ci/agent-action",
   "engines": {
     "node": ">= 12.0"
@@ -30,6 +30,6 @@
   },
   "homepage": "https://relative-ci.com/documentation/setup",
   "dependencies": {
-    "@relative-ci/agent": "^2.1.0"
+    "@relative-ci/agent": "^3.0.0-beta.1"
   }
 }

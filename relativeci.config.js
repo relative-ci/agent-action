@@ -1,5 +1,5 @@
 module.exports = {
   webpack: {
-    stats: './relative-ci--webpack-stats.json',
+    stats: './webpack-stats.json',
   },
 };
