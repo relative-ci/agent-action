@@ -23,7 +23,7 @@ jobs:
       - run: npm run build --if-present
       
       - name: Send webpack stats to RelativeCI
-        uses: relative-ci/agent-action@v1.0.0
+        uses: relative-ci/agent-action@v1.1.0
         with:
           webpackStatsFile: ./artifacts/webpack-stats.json
           key: ${{ secrets.RELATIVE_CI_KEY }}
