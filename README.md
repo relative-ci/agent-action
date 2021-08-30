@@ -44,6 +44,10 @@ jobs:
 
 Your project slug (default: [`GITHUB_REPOSITORY` evironment variable](https://docs.github.com/en/actions/reference/environment-variables#default-environment-variables))
 
+## `includeCommitMessage` (default: `true`)
+
+Fetch commit message from GitHub when the context commit is different that the commit that triggered the workflow (eg: `pull_request` event).
+
 ### `debug`
 
 Enable debug output (default: `false`)

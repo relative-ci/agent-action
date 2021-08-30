@@ -13,6 +13,10 @@ inputs:
   slug:
     description: 'RelativeCI project slug'
     required: false
+  includeCommitMessage:
+    description: 'Include commit message'
+    required: false
+    default: true
   debug:
     description: 'Output debug info'
     required: false
@@ -36,9 +40,11 @@ runs:
     # eg: pull_request
     - uses: actions/github-script@v4
       id: event-commit-message
+      env:
+        INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
       with:
         script: |
-          if (context.eventName !== "pull_request") {
+          if (context.eventName !== "pull_request" || process.env.INCLUDE_COMMIT_MESSAGE === 'false') {
             return "";
           }
 
