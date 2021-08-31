@@ -23,12 +23,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Copy webpack stats file
-      run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
-      shell: bash
-
-    - id: set-debug
-      name: Set DEBUG environment variable
+    # Set DEBUG=relative-ci:agent environment variable if debug input is true
+    - name: Set DEBUG environment variable
+      id: set-debug
       env:
         INPUT_DEBUG: ${{ inputs.debug }}
       run: |
@@ -36,9 +33,9 @@ runs:
         echo "::set-output name=debug::${RELATIVE_CI_DEBUG}"
       shell: bash
 
-    # Get commit message for cases where the build is triggered by a different commit
-    # eg: pull_request
-    - uses: actions/github-script@v4
+    # Get commit message for cases where the build is triggered by a different commit(pull_request)
+    - name: Get commit message
+      uses: actions/github-script@v4
       id: event-commit-message
       env:
         INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
@@ -67,10 +64,14 @@ runs:
           }
 
           return commitMessage;
-
         result-encoding: string
 
-    - run: |
+    - name: Copy webpack stats file
+      run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
+      shell: bash
+
+    - name: Send stats to RelativeCI
+      run: |
         # Go to action directory
         cd ${{ github.action_path }}
 
