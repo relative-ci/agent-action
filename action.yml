@@ -10,6 +10,9 @@ inputs:
   key:
     description: 'RelativeCI project key'
     required: true
+  artifactName:
+    description: 'Artifact to download when running in workflow_run'
+    required: false
   slug:
     description: 'RelativeCI project slug'
     required: false
@@ -34,37 +37,96 @@ runs:
       shell: bash
 
     # Get commit message for cases where the build is triggered by a different commit(pull_request)
-    - name: Get commit message
+    - name: Get commit data
       uses: actions/github-script@v4
-      id: event-commit-message
+      id: commit-data
       env:
         INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
       with:
         script: |
-          if (process.env.INCLUDE_COMMIT_MESSAGE === 'false') {
-            return "";
+          const { eventName, payload } = context;
+          const { pull_request: pullRequest, workflow_run: workflowRun } = payload;
+
+          let commit, commitMessage, branch, pr;
+
+          // Get commit message for pull requests
+          if (eventName === "pull_request" && process.env.INCLUDE_COMMIT_MESSAGE === 'true') {
+            try {
+              const res = await github.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: pullRequest.head.sha,
+              });
+
+              commitMessage = res.data.commit.message;
+              } catch (_) {
+                // noop
+              }
+          } else if (process.env.INCLUDE_COMMIT_MESSAGE === 'true') {
+            commitMessage = payload.head_commit.message;
           }
 
-          if (context.eventName !== "pull_request") {
-            return context.payload.head_commit.message;
+          // Get pull request data
+          if (eventName === 'pull_request') {
+            commit = pullRequest.head.sha;
+            branch = pullRequest.head.ref;
+            pr = pullRequest.number;
           }
 
-          let commitMessage;
+          // Get workflow_run data
+          if (context.eventName === 'workflow_run' && workflowRun) {
+            commit = workflowRun.head_commit.id;
+            commitMessage = workflowRun.head_commit.message;
+            branch = workflowRun.head_branch;
 
-          try {
-            const res = await github.repos.getCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.payload.pull_request.head.sha,
-            });
-
-            commitMessage = res.data.commit.message;
-          } catch (_) {
-            // noop
+            if (workflowRun.event === 'pull_request') {
+              pr = workflowRun.pull_requests[0].number;
+            }
           }
 
-          return commitMessage;
-        result-encoding: string
+          // If undefined, env-ci will infer the GitHub action values
+          return { commit, commitMessage, branch, pr };
+
+    # Download artifacts when artifactName input is set
+    - name: Download artifact
+      uses: actions/github-script@v4
+      id: download-artifact
+      with:
+        script: |
+          const artifactName = '${{ inputs.artifactName }}';
+
+          // Skip when not running on workflow_run or when artifactName is missing
+          if (!artifactName) {
+            return;
+          }
+
+          var artifacts = await github.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: ${{ github.event.workflow_run.id }},
+          });
+
+          var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+            return artifact.name == artifactName
+          })[0];
+
+          var download = await github.actions.downloadArtifact({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            artifact_id: matchArtifact.id,
+            archive_format: 'zip',
+          });
+
+          var fs = require('fs');
+          fs.writeFileSync('${{ github.workspace }}/artifacts.zip', Buffer.from(download.data));
+
+    - name: Unzip artifacts
+      run: |
+        if [[ -f "./artifacts.zip" ]]
+        then
+          unzip ./artifacts.zip
+        fi
+      shell: bash
 
     - name: Copy webpack stats file
       run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
@@ -82,7 +144,7 @@ runs:
         RELATIVE_CI_KEY: ${{ inputs.key }}
         RELATIVE_CI_SLUG: ${{ inputs.slug }}
         DEBUG: ${{ steps.set-debug.outputs.debug }}
-        COMMIT: ${{ github.event.pull_request.head.sha }}
-        COMMIT_MESSAGE: ${{ steps.event-commit-message.outputs.result }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
-        PR: ${{ github.event.pull_request.number }}
+        COMMIT: ${{ fromJSON(steps.commit-data.outputs.result).commit }}
+        COMMIT_MESSAGE: ${{ fromJSON(steps.commit-data.outputs.result).commitMessage }}
+        BRANCH: ${{ fromJSON(steps.commit-data.outputs.result).branch }}
+        PR: ${{ fromJSON(steps.commit-data.outputs.result).pr }}
