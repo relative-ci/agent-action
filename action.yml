@@ -84,6 +84,10 @@ runs:
             if (workflowRun.event === 'pull_request') {
               pr = get(workflowRun, 'pull_requests[0].number');
             }
+
+            if (get(payload, 'owner.login') !== get(workflowRun, 'head_repository.owner.login')) {
+              branch = get(workflowRun, 'head_repository.owner.login') + ':' + branch;
+            }
           }
 
           // If undefined, env-ci will infer the GitHub action values
