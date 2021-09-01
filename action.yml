@@ -44,6 +44,8 @@ runs:
         INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
       with:
         script: |
+          const { get } = require('${{ github.action_path }}/node_modules/lodash');
+
           const { eventName, payload } = context;
           const { pull_request: pullRequest, workflow_run: workflowRun } = payload;
 
@@ -55,7 +57,7 @@ runs:
               const res = await github.repos.getCommit({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                ref: pullRequest.head.sha,
+                ref: get(pullRequest, 'head.sha'),
               });
 
               commitMessage = res.data.commit.message;
@@ -63,24 +65,24 @@ runs:
                 // noop
               }
           } else if (process.env.INCLUDE_COMMIT_MESSAGE === 'true') {
-            commitMessage = payload.head_commit.message;
+            commitMessage = get(payload, 'head_commit.message');
           }
 
           // Get pull request data
           if (eventName === 'pull_request') {
-            commit = pullRequest.head.sha;
-            branch = pullRequest.head.ref;
-            pr = pullRequest.number;
+            commit = get(pullRequest, 'head.sha');
+            branch = get(pullRequest, 'head.ref');
+            pr = get(pullRequest, 'number');
           }
 
           // Get workflow_run data
           if (context.eventName === 'workflow_run' && workflowRun) {
-            commit = workflowRun.head_commit.id;
-            commitMessage = workflowRun.head_commit.message;
-            branch = workflowRun.head_branch;
+            commit = get(workflowRun, 'head_commit.id');
+            commitMessage = get(workflowRun, 'head_commit.message');
+            branch = get(workflowRun, 'head_branch');
 
             if (workflowRun.event === 'pull_request') {
-              pr = workflowRun.pull_requests[0].number;
+              pr = get(workflowRun, 'pull_requests[0].number');
             }
           }
 
