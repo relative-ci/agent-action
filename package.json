@@ -30,6 +30,6 @@
   },
   "homepage": "https://relative-ci.com/documentation/setup",
   "dependencies": {
-    "@relative-ci/agent": "^3.0.0-beta.2"
+    "@relative-ci/agent": "^3.0.0"
   }
 }
