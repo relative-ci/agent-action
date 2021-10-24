@@ -23,6 +23,8 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - uses: hmarr/debug-action@v2
+
     - name: Copy webpack stats file
       run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
       shell: bash

@@ -1,0 +1,36 @@
+{
+  "organization": {
+    "repositories": {
+      "edges": [
+        {
+          "node": {
+            "name": "example-webpack-plugin-github-action",
+            "url": "https://github.com/relative-ci/example-webpack-plugin-github-action",
+            "description": "@relative-ci/agent webpack plugin setup example for Github Action"
+          }
+        },
+        {
+          "node": {
+            "name": "example-bundle-stats-webpack-config",
+            "url": "https://github.com/relative-ci/example-bundle-stats-webpack-config",
+            "description": "BundleStats setup example for custom webpack config"
+          }
+        },
+        {
+          "node": {
+            "name": "example-gatsby",
+            "url": "https://github.com/relative-ci/example-gatsby",
+            "description": "@relative-ci/agent webpack plugin setup example for Gatsby & Gatsby Cloud"
+          }
+        },
+        {
+          "node": {
+            "name": "example-webpack-plugin-codeship",
+            "url": "https://github.com/relative-ci/example-webpack-plugin-codeship",
+            "description": "@relative-ci/agent webpack plugin setup example for Codeship"
+          }
+        }
+      ]
+    }
+  }
+}
