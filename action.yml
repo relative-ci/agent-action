@@ -44,8 +44,12 @@ runs:
         INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
       with:
         script: |
-          if (context.eventName !== "pull_request" || process.env.INCLUDE_COMMIT_MESSAGE === 'false') {
+          if (process.env.INCLUDE_COMMIT_MESSAGE === 'false') {
             return "";
+          }
+
+          if (context.eventName !== "pull_request") {
+            return context.payload.head_commit.message;
           }
 
           let commitMessage;
