@@ -85,8 +85,10 @@ runs:
               pr = get(workflowRun, 'pull_requests[0].number');
             }
 
-            if (get(payload, 'owner.login') !== get(workflowRun, 'head_repository.owner.login')) {
-              branch = get(workflowRun, 'head_repository.owner.login') + ':' + branch;
+            // prefix branch with owner when the event is triggered by a fork
+            const headOwner = get(workflowRun, 'head_repository.owner.login');
+            if (headOwner && headOwner !== get(payload, 'repository.owner.login')) {
+              branch = headOwner  + ':' + branch;
             }
           }
 
