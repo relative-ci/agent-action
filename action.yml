@@ -108,10 +108,15 @@ runs:
             return;
           }
 
+          const runId = '${{ github.event.workflow_run.id }}';
+          if (!runId) {
+            return;
+          }
+
           var artifacts = await github.actions.listWorkflowRunArtifacts({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            run_id: ${{ github.event.workflow_run.id }},
+            run_id: runId,
           });
 
           var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
