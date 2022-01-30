@@ -10,6 +10,9 @@ inputs:
   key:
     description: 'RelativeCI project key'
     required: true
+  artifactName:
+    description: 'Artifact to download when running in workflow_run'
+    required: false
   slug:
     description: 'RelativeCI project slug'
     required: false
@@ -23,12 +26,9 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Copy webpack stats file
-      run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
-      shell: bash
-
-    - id: set-debug
-      name: Set DEBUG environment variable
+    # Set DEBUG=relative-ci:agent environment variable if debug input is true
+    - name: Set DEBUG environment variable
+      id: set-debug
       env:
         INPUT_DEBUG: ${{ inputs.debug }}
       run: |
@@ -36,41 +36,112 @@ runs:
         echo "::set-output name=debug::${RELATIVE_CI_DEBUG}"
       shell: bash
 
-    # Get commit message for cases where the build is triggered by a different commit
-    # eg: pull_request
-    - uses: actions/github-script@v4
-      id: event-commit-message
+    # Get commit message for cases where the build is triggered by a different commit(pull_request)
+    - name: Get commit data
+      uses: actions/github-script@v4
+      id: commit-data
       env:
         INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
       with:
         script: |
-          if (process.env.INCLUDE_COMMIT_MESSAGE === 'false') {
-            return "";
+          const { get } = require('${{ github.action_path }}/node_modules/lodash');
+
+          const { eventName, payload } = context;
+          const { pull_request: pullRequest, workflow_run: workflowRun } = payload;
+
+          let commit, commitMessage, branch, pr;
+
+          // Get commit message for pull requests
+          if (eventName === "pull_request" && process.env.INCLUDE_COMMIT_MESSAGE === 'true') {
+            try {
+              const res = await github.repos.getCommit({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                ref: get(pullRequest, 'head.sha'),
+              });
+
+              commitMessage = res.data.commit.message;
+              } catch (_) {
+                // noop
+              }
+          } else if (process.env.INCLUDE_COMMIT_MESSAGE === 'true') {
+            commitMessage = get(payload, 'head_commit.message');
           }
 
-          if (context.eventName !== "pull_request") {
-            return context.payload.head_commit.message;
+          // Get pull request data
+          if (eventName === 'pull_request') {
+            commit = get(pullRequest, 'head.sha');
+            branch = get(pullRequest, 'head.ref');
+            pr = get(pullRequest, 'number');
           }
 
-          let commitMessage;
+          // Get workflow_run data
+          if (context.eventName === 'workflow_run' && workflowRun) {
+            commit = get(workflowRun, 'head_commit.id');
+            commitMessage = get(workflowRun, 'head_commit.message');
+            branch = get(workflowRun, 'head_branch');
 
-          try {
-            const res = await github.repos.getCommit({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: context.payload.pull_request.head.sha,
-            });
+            if (workflowRun.event === 'pull_request') {
+              pr = get(workflowRun, 'pull_requests[0].number');
+            }
 
-            commitMessage = res.data.commit.message;
-          } catch (_) {
-            // noop
+            // prefix branch with owner when the event is triggered by a fork
+            const headOwner = get(workflowRun, 'head_repository.owner.login');
+            if (headOwner && headOwner !== get(payload, 'repository.owner.login')) {
+              branch = headOwner  + ':' + branch;
+            }
           }
 
-          return commitMessage;
+          // If undefined, env-ci will infer the GitHub action values
+          return { commit, commitMessage, branch, pr };
 
-        result-encoding: string
+    # Download artifacts when artifactName input is set
+    - name: Download artifact
+      uses: actions/github-script@v4
+      id: download-artifact
+      with:
+        script: |
+          const artifactName = '${{ inputs.artifactName }}';
 
-    - run: |
+          // Skip when not running on workflow_run or when artifactName is missing
+          if (!artifactName) {
+            return;
+          }
+
+          var artifacts = await github.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: ${{ github.event.workflow_run.id }},
+          });
+
+          var matchArtifact = artifacts.data.artifacts.filter((artifact) => {
+            return artifact.name == artifactName
+          })[0];
+
+          var download = await github.actions.downloadArtifact({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            artifact_id: matchArtifact.id,
+            archive_format: 'zip',
+          });
+
+          var fs = require('fs');
+          fs.writeFileSync('${{ github.workspace }}/artifacts.zip', Buffer.from(download.data));
+
+    - name: Unzip artifacts
+      run: |
+        if [[ -f "./artifacts.zip" ]]
+        then
+          unzip ./artifacts.zip
+        fi
+      shell: bash
+
+    - name: Copy webpack stats file
+      run: cp ${{ inputs.webpackStatsFile }} ${{ github.action_path}}/webpack-stats.json
+      shell: bash
+
+    - name: Send stats to RelativeCI
+      run: |
         # Go to action directory
         cd ${{ github.action_path }}
 
@@ -81,7 +152,7 @@ runs:
         RELATIVE_CI_KEY: ${{ inputs.key }}
         RELATIVE_CI_SLUG: ${{ inputs.slug }}
         DEBUG: ${{ steps.set-debug.outputs.debug }}
-        COMMIT: ${{ github.event.pull_request.head.sha }}
-        COMMIT_MESSAGE: ${{ steps.event-commit-message.outputs.result }}
-        BRANCH: ${{ github.event.pull_request.head.ref }}
-        PR: ${{ github.event.pull_request.number }}
+        COMMIT: ${{ fromJSON(steps.commit-data.outputs.result).commit }}
+        COMMIT_MESSAGE: ${{ fromJSON(steps.commit-data.outputs.result).commitMessage }}
+        BRANCH: ${{ fromJSON(steps.commit-data.outputs.result).branch }}
+        PR: ${{ fromJSON(steps.commit-data.outputs.result).pr }}

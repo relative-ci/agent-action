@@ -30,6 +30,7 @@
   },
   "homepage": "https://relative-ci.com/documentation/setup",
   "dependencies": {
-    "@relative-ci/agent": "^3.1.0"
+    "@relative-ci/agent": "^3.1.0",
+    "lodash": "^4.17.21"
   }
 }
