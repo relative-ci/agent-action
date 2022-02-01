@@ -38,7 +38,7 @@ runs:
 
     # Get commit message for cases where the build is triggered by a different commit(pull_request)
     - name: Get commit data
-      uses: actions/github-script@v4
+      uses: actions/github-script@v5
       id: commit-data
       env:
         INCLUDE_COMMIT_MESSAGE: ${{ inputs.includeCommitMessage }}
@@ -54,7 +54,7 @@ runs:
           // Get commit message for pull requests
           if (eventName === "pull_request" && process.env.INCLUDE_COMMIT_MESSAGE === 'true') {
             try {
-              const res = await github.repos.getCommit({
+              const res = await github.rest.repos.getCommit({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
                 ref: get(pullRequest, 'head.sha'),
@@ -97,7 +97,7 @@ runs:
 
     # Download artifacts when artifactName input is set
     - name: Download artifact
-      uses: actions/github-script@v4
+      uses: actions/github-script@v5
       id: download-artifact
       with:
         script: |
@@ -113,7 +113,7 @@ runs:
             return;
           }
 
-          var artifacts = await github.actions.listWorkflowRunArtifacts({
+          var artifacts = await github.rest.actions.listWorkflowRunArtifacts({
             owner: context.repo.owner,
             repo: context.repo.repo,
             run_id: runId,
@@ -123,7 +123,7 @@ runs:
             return artifact.name == artifactName
           })[0];
 
-          var download = await github.actions.downloadArtifact({
+          var download = await github.rest.actions.downloadArtifact({
             owner: context.repo.owner,
             repo: context.repo.repo,
             artifact_id: matchArtifact.id,
