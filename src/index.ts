@@ -13,11 +13,11 @@ async function run() {
   try {
     const token = core.getInput('token');
     const key = core.getInput('key');
+    const slug = core.getInput('slug');
     const webpackStatsFile = core.getInput('webpackStatsFile');
     const artifactName = core.getInput('artifactName');
-    const slug = core.getInput('slug');
     const includeCommitMessage = core.getInput('includeCommitMessage') === 'true';
-    const debug = core.getInput('debug');
+    const debug = core.getInput('debug') === 'true';
 
     const { eventName } = github.context;
 

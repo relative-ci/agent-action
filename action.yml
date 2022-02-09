@@ -22,7 +22,6 @@ inputs:
   includeCommitMessage:
     description: 'Include commit message'
     required: false
-    default: true
   debug:
     description: 'Output debug info'
     required: false

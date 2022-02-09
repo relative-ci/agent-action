@@ -49957,7 +49957,7 @@ var _a = process.env,
 
 function run() {
   return index_awaiter(this, void 0, void 0, function () {
-    var token, key, webpackStatsFile, artifactName, slug, includeCommitMessage, debug, eventName, agentParams, webpackStats, err_1;
+    var token, key, slug, webpackStatsFile, artifactName, includeCommitMessage, debug, eventName, agentParams, webpackStats, err_1;
     return index_generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -49965,11 +49965,11 @@ function run() {
 
           token = core.getInput('token');
           key = core.getInput('key');
+          slug = core.getInput('slug');
           webpackStatsFile = core.getInput('webpackStatsFile');
           artifactName = core.getInput('artifactName');
-          slug = core.getInput('slug');
           includeCommitMessage = core.getInput('includeCommitMessage') === 'true';
-          debug = core.getInput('debug');
+          debug = core.getInput('debug') === 'true';
           eventName = github.context.eventName;
           agentParams = void 0;
           if (!(eventName === 'pull_request')) return [3
