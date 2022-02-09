@@ -49699,14 +49699,21 @@ var params_generator = undefined && undefined.__generator || function (thisArg, 
 
 
 
+/**
+  * Extract params from the current ref, env-ci will handle the rest at the agent level
+  */
+
 function extractParams(context) {
   var _a, _b;
 
-  var commitMessage = (_b = (_a = context.payload) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message;
   return {
-    commitMessage: commitMessage
+    commitMessage: (_b = (_a = context.payload) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message
   };
 }
+/**
+  * Exctract params from the pull request event data
+  */
+
 function extractPullRequestParams(context, token, includeCommitMessage) {
   var _a, _b, _c;
 
@@ -49759,6 +49766,10 @@ function extractPullRequestParams(context, token, includeCommitMessage) {
     });
   });
 }
+/**
+  * Extract params from workflow_run event data
+  */
+
 function extractWorkflowRunParams(context) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
 

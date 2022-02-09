@@ -3,11 +3,18 @@ import * as github from '@actions/github';
 import { getGitHubCommitMessage, logger } from './utils';
 import { AgentParams, GitHubContext } from './types';
 
+/**
+  * Extract params from the current ref, env-ci will handle the rest at the agent level
+  */
 export function extractParams(context: GitHubContext): AgentParams {
-  const commitMessage = context.payload?.head_commit?.message;
-  return { commitMessage };
+  return {
+    commitMessage: context.payload?.head_commit?.message,
+  };
 }
 
+/**
+  * Exctract params from the pull request event data
+  */
 export async function extractPullRequestParams(
   context: GitHubContext,
   token: string,
@@ -42,6 +49,9 @@ export async function extractPullRequestParams(
   };
 }
 
+/**
+  * Extract params from workflow_run event data
+  */
 export async function extractWorkflowRunParams(
   context: GitHubContext
 ): Promise<AgentParams> {
