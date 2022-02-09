@@ -49774,14 +49774,14 @@ function extractWorkflowRunParams(context) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
 
   return params_awaiter(this, void 0, void 0, function () {
-    var payload, workflowRun, commit, commitMessage, branch, pr, headOwner;
+    var payload, workflowRun, commit, commitMessage, pr, branch, headOwner;
     return params_generator(this, function (_j) {
       payload = context.payload;
       workflowRun = payload.workflow_run;
       commit = (_a = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.head_commit) === null || _a === void 0 ? void 0 : _a.id;
       commitMessage = (_b = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.head_commit) === null || _b === void 0 ? void 0 : _b.message;
+      pr = workflowRun.event === 'pull_request' ? (_d = (_c = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.pull_requests) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.number : undefined;
       branch = workflowRun.head_branch;
-      pr = workflowRun.event === 'pull_request' && ((_d = (_c = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.pull_requests) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.number);
       headOwner = (_f = (_e = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.head_repository) === null || _e === void 0 ? void 0 : _e.owner) === null || _f === void 0 ? void 0 : _f.login;
 
       if (headOwner && headOwner !== ((_h = (_g = payload === null || payload === void 0 ? void 0 : payload.repository) === null || _g === void 0 ? void 0 : _g.owner) === null || _h === void 0 ? void 0 : _h.login)) {

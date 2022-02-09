@@ -60,9 +60,8 @@ export async function extractWorkflowRunParams(
 
   const commit = workflowRun?.head_commit?.id;
   const commitMessage = workflowRun?.head_commit?.message;
+  const pr = (workflowRun.event === 'pull_request') ? workflowRun?.pull_requests?.[0]?.number : undefined;
   let branch = workflowRun.head_branch;
-  const pr = (workflowRun.event === 'pull_request')
-    && workflowRun?.pull_requests?.[0]?.number;
 
   // prefix branch with owner when the event is triggered by a fork
   const headOwner = workflowRun?.head_repository?.owner?.login;
