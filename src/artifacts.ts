@@ -5,28 +5,36 @@ import * as github from '@actions/github';
 import * as Zip from 'adm-zip';
 
 import { logger } from './utils';
+import * as I18N from './i18n';
+
+const DEFAULT_ARTIFACT_NAME = 'relative-ci-artifacts';
+const DEFAULT_ARTIFACT_WEBPACK_STATS_FILE = 'webpack-stats.json';
 
 export async function getWebpackStatsFromFile(basedir: string, filepath: string): Promise<JSON> {
   const readFile = promisify(fs.readFile);
   const absoluteFilepath = path.join(basedir, filepath);
 
   logger.debug(`Read webpack stats from ${absoluteFilepath}`);
+
   const jsonData = await readFile(absoluteFilepath, 'utf-8');
   return JSON.parse(jsonData);
 }
 
 export async function getWebpackStatsFromArtifact(
   token: string,
-  artifactName?: string,
-  webpackStatsFile?: string
+  inputArtifactName: string,
+  inputArtifactWebpackStatsFile: string
 ): Promise<JSON> {
-  logger.debug('Extract from artifact');
+  const artifactName = inputArtifactName || DEFAULT_ARTIFACT_NAME;
+  const artifactWebpackStatsFile = inputArtifactWebpackStatsFile || DEFAULT_ARTIFACT_WEBPACK_STATS_FILE;
+
+  logger.debug(`Extract webpack stats from '${artifactName}/${artifactWebpackStatsFile}' `);
   const { context } = github;
 
   const runId = context?.payload?.workflow_run?.id;
 
   if (!runId) {
-    throw new Error('Complete workflow run id is missing! Add artifactName only when the action is running during workflow_run');
+    throw new Error(I18N.ERROR_RUN_ID);
   }
 
   const api = github.getOctokit(token);
@@ -45,7 +53,7 @@ export async function getWebpackStatsFromArtifact(
   );
 
   if (!matchArtifact) {
-    throw new Error('No valid artifact available');
+    throw new Error(I18N.ERROR_MISSING_ARTIFACT);
   }
 
   logger.debug(`Download artifact ${matchArtifact.id}`);
@@ -57,15 +65,19 @@ export async function getWebpackStatsFromArtifact(
   });
 
   if (!download) {
-    throw new Error('The artifact is missing, make sure you are passing the correct "artifactName" input!');
+    throw new Error(I18N.ERROR_MISSING_ARTIFACT);
   }
 
   const zip = new Zip(Buffer.from(download.data as string));
-  // @TODO webpackStatsFile needs to match exaclty, no "./" prefix
-  const webpackStats = zip.readAsText(webpackStatsFile, 'utf-8');
+
+  logger.debug(`Read artifact '${artifactWebpackStatsFile}' from '${artifactName}' archive`);
+  const webpackStats = zip.readAsText(artifactWebpackStatsFile, 'utf-8');
 
   if (!webpackStats) {
-    throw new Error('The artifact webpack stats file is missing, make sure you are passing a correct "webpackStatsFile" input!');
+    throw new Error(
+      `Unable to unzip '${artifactWebpackStatsFile}' from '${artifactName}' archive.
+       Please make sure the value of 'artifactWebpackStatsFile' is correct.
+    `);
   }
 
   return JSON.parse(webpackStats);

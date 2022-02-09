@@ -49126,6 +49126,8 @@ var COMMIT_MESSAGE = 'Fetching commit message from GitHub';
 var COMMIT_MESSAGE_ERROR = 'Error fetching commit message';
 var MISSING_INPUT_ARTIFACT_NAME = '`artifactName` input is required when running during workflow_run';
 var MISSING_INPUT_WEBPACK_STATS_FILE = 'when running during workflow_run';
+var ERROR_RUN_ID = 'Workflow run id is missing! Make sure artifactName input is set correctly.';
+var ERROR_MISSING_ARTIFACT = 'Artifact is missing! Make sure artifactName input is set correctly.';
 ;// CONCATENATED MODULE: ./utils.ts
 var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -49465,6 +49467,9 @@ var artifacts_generator = undefined && undefined.__generator || function (thisAr
 
 
 
+
+var DEFAULT_ARTIFACT_NAME = 'relative-ci-artifacts';
+var DEFAULT_ARTIFACT_WEBPACK_STATS_FILE = 'webpack-stats.json';
 function getWebpackStatsFromFile(basedir, filepath) {
   return artifacts_awaiter(this, void 0, void 0, function () {
     var readFile, absoluteFilepath, jsonData;
@@ -49487,20 +49492,22 @@ function getWebpackStatsFromFile(basedir, filepath) {
     });
   });
 }
-function getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile) {
+function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebpackStatsFile) {
   var _a, _b, _c;
 
   return artifacts_awaiter(this, void 0, void 0, function () {
-    var context, runId, api, workflowRunArtifactsParams, artifacts, matchArtifact, download, zip, webpackStats;
+    var artifactName, artifactWebpackStatsFile, context, runId, api, workflowRunArtifactsParams, artifacts, matchArtifact, download, zip, webpackStats;
     return artifacts_generator(this, function (_d) {
       switch (_d.label) {
         case 0:
-          logger.debug('Extract from artifact');
+          artifactName = inputArtifactName || DEFAULT_ARTIFACT_NAME;
+          artifactWebpackStatsFile = inputArtifactWebpackStatsFile || DEFAULT_ARTIFACT_WEBPACK_STATS_FILE;
+          logger.debug("Extract webpack stats from '".concat(artifactName, "/").concat(artifactWebpackStatsFile, "' "));
           context = github.context;
           runId = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.workflow_run) === null || _b === void 0 ? void 0 : _b.id;
 
           if (!runId) {
-            throw new Error('Complete workflow run id is missing! Add artifactName only when the action is running during workflow_run');
+            throw new Error(ERROR_RUN_ID);
           }
 
           api = github.getOctokit(token);
@@ -49521,7 +49528,7 @@ function getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile) {
           });
 
           if (!matchArtifact) {
-            throw new Error('No valid artifact available');
+            throw new Error(ERROR_MISSING_ARTIFACT);
           }
 
           logger.debug("Download artifact ".concat(matchArtifact.id));
@@ -49538,14 +49545,15 @@ function getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile) {
           download = _d.sent();
 
           if (!download) {
-            throw new Error('The artifact is missing, make sure you are passing the correct "artifactName" input!');
+            throw new Error(ERROR_MISSING_ARTIFACT);
           }
 
           zip = new adm_zip(Buffer.from(download.data));
-          webpackStats = zip.readAsText(webpackStatsFile, 'utf-8');
+          logger.debug("Read artifact '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive"));
+          webpackStats = zip.readAsText(artifactWebpackStatsFile, 'utf-8');
 
           if (!webpackStats) {
-            throw new Error('The artifact webpack stats file is missing, make sure you are passing a correct "webpackStatsFile" input!');
+            throw new Error("Unable to unzip '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive.\n       Please make sure the value of 'artifactWebpackStatsFile' is correct.\n    "));
           }
 
           return [2
@@ -50023,15 +50031,6 @@ function run() {
           if (!(eventName === 'workflow_run')) return [3
           /*break*/
           , 7];
-
-          if (!artifactName) {
-            throw new Error(MISSING_INPUT_ARTIFACT_NAME);
-          }
-
-          if (!webpackStatsFile) {
-            throw new Error(MISSING_INPUT_WEBPACK_STATS_FILE);
-          }
-
           return [4
           /*yield*/
           , getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile)];

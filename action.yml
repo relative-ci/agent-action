@@ -7,14 +7,11 @@ inputs:
   token: 
     description: GitHub token
     required: true
-  webpackStatsFile:
-    description: 'Path to your local webpack stats file'
-    required: true
   key:
     description: 'RelativeCI project key'
     required: true
-  artifactName:
-    description: 'Artifact to download when running in workflow_run'
+  webpackStatsFile:
+    description: 'Path to your local webpack stats file'
     required: false
   slug:
     description: 'RelativeCI project slug'
@@ -24,6 +21,12 @@ inputs:
     required: false
   debug:
     description: 'Output debug info'
+    required: false
+  artifactName:
+    description: 'Artifact to download when running in workflow_run'
+    required: false
+  artifactWebpackStatsFile:
+    description: 'Artifact webpack stats file path'
     required: false
 runs:
   using: 'node16'

@@ -43,14 +43,6 @@ async function run() {
 
     // Get webpack stats file from an artifact
     if (eventName === 'workflow_run') {
-      if (!artifactName) {
-        throw new Error(I18N.MISSING_INPUT_ARTIFACT_NAME);
-      }
-
-      if (!webpackStatsFile) {
-        throw new Error(I18N.MISSING_INPUT_WEBPACK_STATS_FILE);
-      }
-
       webpackStats = await getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile);
 
       // Get webpack stats from a file
