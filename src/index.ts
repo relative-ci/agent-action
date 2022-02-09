@@ -26,15 +26,17 @@ async function run() {
     let agentParams;
 
     if (eventName === 'pull_request') {
-      logger.debug('pull_request flow');
+      logger.debug('Extract params for pull_request flow');
       agentParams = await extractPullRequestParams(github.context, token, includeCommitMessage);
     } else if (eventName === 'workflow_run') {
-      logger.debug('workflow_run flow');
+      logger.debug('Extract params for workflow_run flow');
       agentParams = await extractWorkflowRunParams(github.context);
     } else {
-      logger.debug('default flow');
+      logger.debug('Extract params for default flow');
       agentParams = extractParams(github.context);
     }
+
+    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`)
 
     // Get webpack stats json
     let webpackStats = {};

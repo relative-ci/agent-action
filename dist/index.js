@@ -49986,7 +49986,7 @@ function run() {
           if (!(eventName === 'pull_request')) return [3
           /*break*/
           , 2];
-          logger.debug('pull_request flow');
+          logger.debug('Extract params for pull_request flow');
           return [4
           /*yield*/
           , extractPullRequestParams(github.context, token, includeCommitMessage)];
@@ -50001,7 +50001,7 @@ function run() {
           if (!(eventName === 'workflow_run')) return [3
           /*break*/
           , 4];
-          logger.debug('workflow_run flow');
+          logger.debug('Extract params for workflow_run flow');
           return [4
           /*yield*/
           , extractWorkflowRunParams(github.context)];
@@ -50013,11 +50013,12 @@ function run() {
           , 5];
 
         case 4:
-          logger.debug('default flow');
+          logger.debug('Extract params for default flow');
           agentParams = extractParams(github.context);
           _a.label = 5;
 
         case 5:
+          logger.debug("Agent params: ".concat(JSON.stringify(agentParams)));
           webpackStats = {};
           if (!(eventName === 'workflow_run')) return [3
           /*break*/
