@@ -6,8 +6,8 @@ import * as Zip from 'adm-zip';
 
 import { logger } from './utils';
 
-export async function getWebpackStats(basedir:string, filepath: string): Promise<JSON> {
-  const readFile= promisify(fs.readFile);
+export async function getWebpackStatsFromFile(basedir: string, filepath: string): Promise<JSON> {
+  const readFile = promisify(fs.readFile);
   const absoluteFilepath = path.join(basedir, filepath);
 
   logger.debug(`Read webpack stats from ${absoluteFilepath}`);
@@ -15,7 +15,7 @@ export async function getWebpackStats(basedir:string, filepath: string): Promise
   return JSON.parse(jsonData);
 }
 
-export async function downloadWorkflowArtifact(
+export async function getWebpackStatsFromArtifact(
   token: string,
   artifactName?: string,
   webpackStatsFile?: string

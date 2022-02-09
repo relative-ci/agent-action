@@ -49124,6 +49124,8 @@ var adm_zip = __webpack_require__(17772);
 ;// CONCATENATED MODULE: ./i18n.ts
 var COMMIT_MESSAGE = 'Fetching commit message from GitHub';
 var COMMIT_MESSAGE_ERROR = 'Error fetching commit message';
+var MISSING_INPUT_ARTIFACT_NAME = '`artifactName` input is required when running during workflow_run';
+var MISSING_INPUT_WEBPACK_STATS_FILE = 'when running during workflow_run';
 ;// CONCATENATED MODULE: ./utils.ts
 var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -49463,7 +49465,7 @@ var artifacts_generator = undefined && undefined.__generator || function (thisAr
 
 
 
-function getWebpackStats(basedir, filepath) {
+function getWebpackStatsFromFile(basedir, filepath) {
   return artifacts_awaiter(this, void 0, void 0, function () {
     var readFile, absoluteFilepath, jsonData;
     return artifacts_generator(this, function (_a) {
@@ -49485,7 +49487,7 @@ function getWebpackStats(basedir, filepath) {
     });
   });
 }
-function downloadWorkflowArtifact(token, artifactName, webpackStatsFile) {
+function getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile) {
   var _a, _b, _c;
 
   return artifacts_awaiter(this, void 0, void 0, function () {
@@ -49948,6 +49950,7 @@ var index_generator = undefined && undefined.__generator || function (thisArg, b
 
 
 
+
 var _a = process.env,
     ACTIONS_STEP_DEBUG = _a.ACTIONS_STEP_DEBUG,
     GITHUB_WORKSPACE = _a.GITHUB_WORKSPACE;
@@ -49958,7 +49961,7 @@ function run() {
     return index_generator(this, function (_a) {
       switch (_a.label) {
         case 0:
-          _a.trys.push([0, 12,, 13]);
+          _a.trys.push([0, 11,, 12]);
 
           token = core.getInput('token');
           key = core.getInput('key');
@@ -50005,37 +50008,42 @@ function run() {
 
         case 5:
           webpackStats = {};
-          if (!(artifactName && webpackStatsFile)) return [3
+          if (!(eventName === 'workflow_run')) return [3
           /*break*/
           , 7];
+
+          if (!artifactName) {
+            throw new Error(MISSING_INPUT_ARTIFACT_NAME);
+          }
+
+          if (!webpackStatsFile) {
+            throw new Error(MISSING_INPUT_WEBPACK_STATS_FILE);
+          }
+
           return [4
           /*yield*/
-          , downloadWorkflowArtifact(token, artifactName, webpackStatsFile)];
+          , getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile)];
 
         case 6:
           webpackStats = _a.sent();
           return [3
           /*break*/
-          , 10];
+          , 9];
 
         case 7:
-          if (!webpackStatsFile) return [3
-          /*break*/
-          , 9];
+          if (!webpackStatsFile) {
+            throw new Error(MISSING_INPUT_WEBPACK_STATS_FILE);
+          }
+
           return [4
           /*yield*/
-          , getWebpackStats(GITHUB_WORKSPACE, webpackStatsFile)];
+          , getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile)];
 
         case 8:
           webpackStats = _a.sent();
-          return [3
-          /*break*/
-          , 10];
+          _a.label = 9;
 
         case 9:
-          throw new Error('Missing webpackStatsFile');
-
-        case 10:
           // Set RelativeCI service key
           // @TODO pass it as an argument to agent
           process.env.RELATIVE_CI_KEY = key; // Enable debugging for when debug input or ACTIONS_STEP_DEBUG is set
@@ -50055,21 +50063,21 @@ function run() {
             slug: slug
           }, agentParams))];
 
-        case 11:
+        case 10:
           _a.sent();
 
           return [3
           /*break*/
-          , 13];
+          , 12];
 
-        case 12:
+        case 11:
           err_1 = _a.sent();
           core.setFailed(err_1);
           return [3
           /*break*/
-          , 13];
+          , 12];
 
-        case 13:
+        case 12:
           return [2
           /*return*/
           ];

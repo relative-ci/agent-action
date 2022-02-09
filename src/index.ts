@@ -2,9 +2,10 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import { agent } from '@relative-ci/agent/lib/agent';
 
-import { getWebpackStats, downloadWorkflowArtifact } from './artifacts';
+import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
 import { logger } from './utils';
+import * as I18N from './i18n';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
@@ -38,12 +39,25 @@ async function run() {
     // Get webpack stats json
     let webpackStats = {};
 
-    if (artifactName && webpackStatsFile) {
-      webpackStats = await downloadWorkflowArtifact(token, artifactName, webpackStatsFile);
-    } else if (webpackStatsFile) {
-      webpackStats = await getWebpackStats(GITHUB_WORKSPACE, webpackStatsFile);
+    // Get webpack stats file from an artifact
+    if (eventName === 'workflow_run') {
+      if (!artifactName) {
+        throw new Error(I18N.MISSING_INPUT_ARTIFACT_NAME);
+      }
+
+      if (!webpackStatsFile) {
+        throw new Error(I18N.MISSING_INPUT_WEBPACK_STATS_FILE);
+      }
+
+      webpackStats = await getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile);
+
+      // Get webpack stats from a file
     } else {
-      throw new Error('Missing webpackStatsFile');
+      if (!webpackStatsFile) {
+        throw new Error(I18N.MISSING_INPUT_WEBPACK_STATS_FILE);
+      }
+
+      webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
 
     // Set RelativeCI service key
