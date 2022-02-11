@@ -1,8 +1,6 @@
 import * as core from '@actions/core';
 import { GitHub } from '@actions/github/lib/utils';
 
-import * as I18N from './i18n';
-
 export const logger: Omit<typeof core, 'info | debug | warning | error'> = core;
 
 interface GetGitHubCommitMessageParams {
@@ -17,8 +15,7 @@ export async function getGitHubCommitMessage(
 ): Promise<string | undefined> {
   const { octokit, owner, repo, ref } = params;
 
-  logger.debug(I18N.COMMIT_MESSAGE)
-
+  logger.debug(`Fetching commit message`);
   let commitMessage;
 
   try {
@@ -30,7 +27,7 @@ export async function getGitHubCommitMessage(
 
     commitMessage = res?.data?.commit?.message;
   } catch (err) {
-    logger.debug(I18N.COMMIT_MESSAGE_ERROR);
+    logger.debug(`Error fetching commit message: ${err.message}`);
     logger.warning(err);
   }
 

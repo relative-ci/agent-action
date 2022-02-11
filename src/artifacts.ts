@@ -5,7 +5,6 @@ import * as github from '@actions/github';
 import * as Zip from 'adm-zip';
 
 import { logger } from './utils';
-import * as I18N from './i18n';
 
 const DEFAULT_ARTIFACT_NAME = 'relative-ci-artifacts';
 const DEFAULT_ARTIFACT_WEBPACK_STATS_FILE = 'webpack-stats.json';
@@ -34,7 +33,7 @@ export async function getWebpackStatsFromArtifact(
   const runId = context?.payload?.workflow_run?.id;
 
   if (!runId) {
-    throw new Error(I18N.ERROR_RUN_ID);
+    throw new Error(`Worflow 'runId' is missing! Please make sure your worklow is set up correctly.`);
   }
 
   const api = github.getOctokit(token);
@@ -53,7 +52,7 @@ export async function getWebpackStatsFromArtifact(
   );
 
   if (!matchArtifact) {
-    throw new Error(I18N.ERROR_MISSING_ARTIFACT);
+    throw new Error(`Artifact '${artifactName}' could not be found! Please make sure 'artifactName' is correct.`);
   }
 
   logger.debug(`Download artifact ${matchArtifact.id}`);
@@ -65,7 +64,7 @@ export async function getWebpackStatsFromArtifact(
   });
 
   if (!download) {
-    throw new Error(I18N.ERROR_MISSING_ARTIFACT);
+    throw new Error(`Artifact '${artifactName}(id: ${matchArtifact.id}) could not be downloaded. Please try again!`);
   }
 
   const zip = new Zip(Buffer.from(download.data as string));

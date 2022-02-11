@@ -5,7 +5,6 @@ import { agent } from '@relative-ci/agent/lib/agent';
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
 import { logger } from './utils';
-import * as I18N from './i18n';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
@@ -48,7 +47,7 @@ async function run() {
       // Get webpack stats from a file
     } else {
       if (!webpackStatsFile) {
-        throw new Error(I18N.MISSING_INPUT_WEBPACK_STATS_FILE);
+        throw new Error('`webpackStatsFile` input is required!');
       }
 
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
@@ -58,7 +57,7 @@ async function run() {
     // @TODO pass it as an argument to agent
     process.env.RELATIVE_CI_KEY = key;
 
-    // Enable debugging for when debug input or ACTIONS_STEP_DEBUG is set
+    // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
     if (debug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }

@@ -49121,13 +49121,6 @@ var external_path_ = __webpack_require__(71017);
 var external_fs_ = __webpack_require__(57147);
 // EXTERNAL MODULE: ../node_modules/adm-zip/adm-zip.js
 var adm_zip = __webpack_require__(17772);
-;// CONCATENATED MODULE: ./i18n.ts
-var COMMIT_MESSAGE = 'Fetching commit message from GitHub';
-var COMMIT_MESSAGE_ERROR = 'Error fetching commit message';
-var MISSING_INPUT_ARTIFACT_NAME = '`artifactName` input is required when running during workflow_run';
-var MISSING_INPUT_WEBPACK_STATS_FILE = 'when running during workflow_run';
-var ERROR_RUN_ID = 'Workflow run id is missing! Make sure artifactName input is set correctly.';
-var ERROR_MISSING_ARTIFACT = 'Artifact is missing! Make sure artifactName input is set correctly.';
 ;// CONCATENATED MODULE: ./utils.ts
 var __awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
   function adopt(value) {
@@ -49271,7 +49264,6 @@ var __generator = undefined && undefined.__generator || function (thisArg, body)
 };
 
 
-
 var logger = core;
 function getGitHubCommitMessage(params) {
   var _a, _b;
@@ -49282,7 +49274,7 @@ function getGitHubCommitMessage(params) {
       switch (_c.label) {
         case 0:
           octokit = params.octokit, owner = params.owner, repo = params.repo, ref = params.ref;
-          logger.debug(COMMIT_MESSAGE);
+          logger.debug("Fetching commit message");
           _c.label = 1;
 
         case 1:
@@ -49305,7 +49297,7 @@ function getGitHubCommitMessage(params) {
 
         case 3:
           err_1 = _c.sent();
-          logger.debug(COMMIT_MESSAGE_ERROR);
+          logger.debug("Error fetching commit message: ".concat(err_1.message));
           logger.warning(err_1);
           return [3
           /*break*/
@@ -49467,7 +49459,6 @@ var artifacts_generator = undefined && undefined.__generator || function (thisAr
 
 
 
-
 var DEFAULT_ARTIFACT_NAME = 'relative-ci-artifacts';
 var DEFAULT_ARTIFACT_WEBPACK_STATS_FILE = 'webpack-stats.json';
 function getWebpackStatsFromFile(basedir, filepath) {
@@ -49507,7 +49498,7 @@ function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebp
           runId = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.workflow_run) === null || _b === void 0 ? void 0 : _b.id;
 
           if (!runId) {
-            throw new Error(ERROR_RUN_ID);
+            throw new Error("Worflow 'runId' is missing! Please make sure your worklow is set up correctly.");
           }
 
           api = github.getOctokit(token);
@@ -49528,7 +49519,7 @@ function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebp
           });
 
           if (!matchArtifact) {
-            throw new Error(ERROR_MISSING_ARTIFACT);
+            throw new Error("Artifact '".concat(artifactName, "' could not be found! Please make sure 'artifactName' is correct."));
           }
 
           logger.debug("Download artifact ".concat(matchArtifact.id));
@@ -49545,7 +49536,7 @@ function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebp
           download = _d.sent();
 
           if (!download) {
-            throw new Error(ERROR_MISSING_ARTIFACT);
+            throw new Error("Artifact '".concat(artifactName, "(id: ").concat(matchArtifact.id, ") could not be downloaded. Please try again!"));
           }
 
           zip = new adm_zip(Buffer.from(download.data));
@@ -49969,7 +49960,6 @@ var index_generator = undefined && undefined.__generator || function (thisArg, b
 
 
 
-
 var _a = process.env,
     ACTIONS_STEP_DEBUG = _a.ACTIONS_STEP_DEBUG,
     GITHUB_WORKSPACE = _a.GITHUB_WORKSPACE;
@@ -50043,7 +50033,7 @@ function run() {
 
         case 7:
           if (!webpackStatsFile) {
-            throw new Error(MISSING_INPUT_WEBPACK_STATS_FILE);
+            throw new Error('`webpackStatsFile` input is required!');
           }
 
           return [4
@@ -50057,7 +50047,7 @@ function run() {
         case 9:
           // Set RelativeCI service key
           // @TODO pass it as an argument to agent
-          process.env.RELATIVE_CI_KEY = key; // Enable debugging for when debug input or ACTIONS_STEP_DEBUG is set
+          process.env.RELATIVE_CI_KEY = key; // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
 
           if (debug || ACTIONS_STEP_DEBUG) {
             process.env.DEBUG = 'relative-ci:agent';
