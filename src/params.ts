@@ -26,17 +26,22 @@ export async function extractPullRequestParams(
   let commitMessage;
 
   if (includeCommitMessage) {
+    logger.debug(`Fetching commit message for '${repo.owner}/${repo.repo}#${pullRequest?.head?.sha}'`);
+
     if (!token) {
       logger.error('"token" input is required when "includeCommitMessage" is true');
     } else {
       const octokit = github.getOctokit(token);
-
-      commitMessage = await getGitHubCommitMessage({
-        octokit,
-        owner: repo.owner,
-        repo: repo.repo,
-        ref: pullRequest?.head?.sha,
-      });
+      try {
+        commitMessage = await getGitHubCommitMessage({
+          octokit,
+          owner: repo.owner,
+          repo: repo.repo,
+          ref: pullRequest?.head?.sha,
+        });
+      } catch (err) {
+        logger.error(`Error fetching commit data: ${err.message}`);
+      }
     }
   }
 
