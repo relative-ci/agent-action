@@ -49714,44 +49714,59 @@ function extractParams(context) {
   */
 
 function extractPullRequestParams(context, token, includeCommitMessage) {
-  var _a, _b, _c;
+  var _a, _b, _c, _d;
 
   return params_awaiter(this, void 0, void 0, function () {
-    var payload, repo, pullRequest, commitMessage, octokit, commit, branch, pr;
-    return params_generator(this, function (_d) {
-      switch (_d.label) {
+    var payload, repo, pullRequest, commitMessage, octokit, err_1, commit, branch, pr;
+    return params_generator(this, function (_e) {
+      switch (_e.label) {
         case 0:
           payload = context.payload, repo = context.repo;
           pullRequest = payload.pull_request;
           if (!includeCommitMessage) return [3
           /*break*/
-          , 3];
+          , 5];
+          logger.debug("Fetching commit message for '".concat(repo.owner, "/").concat(repo.repo, "#").concat((_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha, "'"));
           if (!!token) return [3
           /*break*/
           , 1];
           logger.error('"token" input is required when "includeCommitMessage" is true');
           return [3
           /*break*/
-          , 3];
+          , 5];
 
         case 1:
           octokit = github.getOctokit(token);
+          _e.label = 2;
+
+        case 2:
+          _e.trys.push([2, 4,, 5]);
+
           return [4
           /*yield*/
           , getGitHubCommitMessage({
             octokit: octokit,
             owner: repo.owner,
             repo: repo.repo,
-            ref: (_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha
+            ref: (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _b === void 0 ? void 0 : _b.sha
           })];
 
-        case 2:
-          commitMessage = _d.sent();
-          _d.label = 3;
-
         case 3:
-          commit = (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _b === void 0 ? void 0 : _b.sha;
-          branch = (_c = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _c === void 0 ? void 0 : _c.ref;
+          commitMessage = _e.sent();
+          return [3
+          /*break*/
+          , 5];
+
+        case 4:
+          err_1 = _e.sent();
+          logger.error("Error fetching commit data: ".concat(err_1.message));
+          return [3
+          /*break*/
+          , 5];
+
+        case 5:
+          commit = (_c = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _c === void 0 ? void 0 : _c.sha;
+          branch = (_d = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _d === void 0 ? void 0 : _d.ref;
           pr = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number;
           return [2
           /*return*/
