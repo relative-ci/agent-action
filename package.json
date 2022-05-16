@@ -32,7 +32,7 @@
     "build": "webpack --mode production"
   },
   "dependencies": {
-    "@actions/core": "1.7.0",
+    "@actions/core": "1.8.2",
     "@actions/github": "5.0.2",
     "@octokit/webhooks-definitions": "^3.67.3",
     "@relative-ci/agent": "^3.1.3",
