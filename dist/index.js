@@ -50450,7 +50450,7 @@ var _a = process.env,
 
 function run() {
   return index_awaiter(this, void 0, void 0, function () {
-    var token, key, slug, webpackStatsFile, artifactName, includeCommitMessage, debug, eventName, agentParams, webpackStats, err_1;
+    var token, key, slug, endpoint, webpackStatsFile, artifactName, includeCommitMessage, debug, eventName, agentParams, webpackStats, err_1;
     return index_generator(this, function (_a) {
       switch (_a.label) {
         case 0:
@@ -50459,6 +50459,7 @@ function run() {
           token = core.getInput('token');
           key = core.getInput('key');
           slug = core.getInput('slug');
+          endpoint = core.getInput('endpoint');
           webpackStatsFile = core.getInput('webpackStatsFile');
           artifactName = core.getInput('artifactName');
           includeCommitMessage = core.getInput('includeCommitMessage') === 'true';
@@ -50531,7 +50532,8 @@ function run() {
         case 9:
           // Set RelativeCI service key
           // @TODO pass it as an argument to agent
-          process.env.RELATIVE_CI_KEY = key; // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
+          process.env.RELATIVE_CI_KEY = key;
+          process.env.RELATIVE_CI_ENDPOINT = endpoint; // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
 
           if (debug || ACTIONS_STEP_DEBUG) {
             process.env.DEBUG = 'relative-ci:agent';
