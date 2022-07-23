@@ -13,6 +13,7 @@ async function run() {
     const token = core.getInput('token');
     const key = core.getInput('key');
     const slug = core.getInput('slug');
+    const endpoint = core.getInput('endpoint');
     const webpackStatsFile = core.getInput('webpackStatsFile');
     const artifactName = core.getInput('artifactName');
     const includeCommitMessage = core.getInput('includeCommitMessage') === 'true';
@@ -56,6 +57,7 @@ async function run() {
     // Set RelativeCI service key
     // @TODO pass it as an argument to agent
     process.env.RELATIVE_CI_KEY = key;
+    process.env.RELATIVE_CI_ENDPOINT = endpoint;
 
     // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
     if (debug || ACTIONS_STEP_DEBUG) {

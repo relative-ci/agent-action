@@ -16,6 +16,9 @@ inputs:
   slug:
     description: 'RelativeCI project slug'
     required: false
+  endpoint:
+    description: 'RelativeCI ingest endpoint'
+    required: false
   includeCommitMessage:
     description: 'Include commit message'
     required: false
