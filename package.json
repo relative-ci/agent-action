@@ -35,7 +35,7 @@
     "@actions/core": "1.10.0",
     "@actions/github": "5.1.1",
     "@octokit/webhooks-definitions": "^3.67.3",
-    "@relative-ci/agent": "^4.1.0",
+    "@relative-ci/agent": "^4.1.1",
     "adm-zip": "^0.5.9",
     "lodash": "^4.17.21"
   },
