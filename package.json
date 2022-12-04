@@ -35,23 +35,23 @@
     "@actions/core": "1.10.0",
     "@actions/github": "5.1.1",
     "@octokit/webhooks-definitions": "^3.67.3",
-    "@relative-ci/agent": "^4.1.1",
+    "@relative-ci/agent": "^4.1.2",
     "adm-zip": "^0.5.9",
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@babel/core": "7.19.3",
+    "@babel/core": "7.20.5",
     "@babel/eslint-parser": "^7.19.1",
-    "@babel/preset-env": "7.19.3",
+    "@babel/preset-env": "7.20.2",
     "@types/adm-zip": "^0.5.0",
-    "babel-loader": "8.2.5",
-    "core-js": "3.25.5",
+    "babel-loader": "9.1.0",
+    "core-js": "3.26.1",
     "encoding": "^0.1.13",
-    "eslint": "^8.24.0",
+    "eslint": "^8.29.0",
     "eslint-config-airbnb-base": "^15.0.0",
-    "ts-loader": "^9.4.1",
-    "typescript": "^4.8.4",
-    "webpack": "5.74.0",
-    "webpack-cli": "4.10.0"
+    "ts-loader": "^9.4.2",
+    "typescript": "^4.9.3",
+    "webpack": "5.75.0",
+    "webpack-cli": "5.0.0"
   }
 }
