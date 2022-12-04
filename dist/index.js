@@ -4445,45 +4445,32 @@ __webpack_unused_export__ = ({
   value: true
 });
 exports.W = void 0;
-
 var _dotenv = _interopRequireDefault(__webpack_require__(1656));
-
 var _lodash = __webpack_require__(8784);
-
 var _pluginWebpackFilter = _interopRequireDefault(__webpack_require__(1779));
-
 var _package = _interopRequireDefault(__webpack_require__(9839));
-
 var LOCALES = _interopRequireWildcard(__webpack_require__(1461));
-
 var _send = _interopRequireDefault(__webpack_require__(4306));
-
 var _utils = __webpack_require__(6531);
-
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
-
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 const DEFAULT_ENDPOINT = 'https://api.relative-ci.com/save';
 const WEBPACK_STATS = 'webpack.stats';
 const SOURCE_EXTRACTORS = {
   [WEBPACK_STATS]: _pluginWebpackFilter.default
 };
-
 const getFilteredData = artifactsData => artifactsData.reduce((agg, {
   key,
   data,
   options
 }) => (0, _lodash.set)(agg, key, SOURCE_EXTRACTORS[key](data, options)), {});
-
 const agent = (artifactsData, config, args = {}, logger = console) => {
   _dotenv.default.config();
-
   const envCIVars = (0, _utils.getEnvCI)();
-  (0, _utils.debug)('env-ci environment variables', envCIVars); // Resolved params
+  (0, _utils.debug)('env-ci environment variables', envCIVars);
 
+  // Resolved params
   const envVars = {
     slug: args.slug || process.env.RELATIVE_CI_SLUG || envCIVars.slug,
     // env-ci is reporting the branch of the PR as prBranch
@@ -4511,29 +4498,26 @@ const agent = (artifactsData, config, args = {}, logger = console) => {
       commitMessage: (0, _utils.getCommitMessage)()
     })
   };
-  (0, _utils.debug)('Job parameters', params); // Validate parameters
+  (0, _utils.debug)('Job parameters', params);
 
+  // Validate parameters
   if (!params.key) {
     return logger.warn(LOCALES.AGENT_MISSING_KEY_ERROR);
   }
-
   if (!params.slug) {
     return logger.warn(LOCALES.AGENT_MISSING_SLUG_ERROR);
   }
-
   if (!params.commit) {
     return logger.warn(LOCALES.AGENT_MISSING_COMMIT_ERROR);
   }
-
   if (!params.branch) {
     return logger.warn(LOCALES.AGENT_MISSING_BRANCH_ERROR);
-  } // Filter only the necessary data
+  }
 
-
+  // Filter only the necessary data
   const filteredData = getFilteredData(artifactsData);
   return (0, _send.default)(filteredData, params, config, logger);
 };
-
 exports.W = agent;
 
 /***/ }),
@@ -4548,21 +4532,13 @@ Object.defineProperty(exports, "__esModule", ({
   value: true
 }));
 exports["default"] = void 0;
-
 __webpack_require__(1418);
-
 var _fs = _interopRequireDefault(__webpack_require__(7147));
-
 var _lodash = __webpack_require__(8784);
-
 var _isomorphicFetch = _interopRequireDefault(__webpack_require__(7410));
-
 var _en = _interopRequireDefault(__webpack_require__(1461));
-
 var _utils = __webpack_require__(6531);
-
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 var _default = async (data, params, config, logger) => {
   const {
     key,
@@ -4597,24 +4573,20 @@ var _default = async (data, params, config, logger) => {
   } = config;
   (0, _utils.debug)('Payload', payload);
   (0, _utils.debug)('Payload size', Buffer.byteLength(JSON.stringify(payload)));
-
   if (payloadFilepath) {
     logger.info('Save payload to', payloadFilepath);
-
     try {
       // Obfuscate private data
-      const output = { ...payload,
+      const output = {
+        ...payload,
         key: '***'
       };
-
       _fs.default.writeFileSync(payloadFilepath, JSON.stringify(output, null, 2));
     } catch (err) {
       logger.warn('Error saving payload', err.message);
     }
   }
-
   logger.info('Send stats to RelativeCI', `branch=${branch}`, `commit=${commit}`);
-
   try {
     const response = await (0, _isomorphicFetch.default)(endpoint, {
       method: 'POST',
@@ -4625,21 +4597,17 @@ var _default = async (data, params, config, logger) => {
     });
     const responseData = await response.json();
     (0, _utils.debug)('Response', responseData);
-
     if (responseData.code) {
       logger.warn(responseData);
       return;
     }
-
     const {
       res
     } = responseData;
-
     if (!res) {
       logger.warn(_en.default.GENERIC_ERROR, responseData);
       return;
     }
-
     const buildNumber = (0, _lodash.get)(res, 'job.internalBuildNumber');
     const buildSizeInfo = (0, _lodash.get)(responseData, 'info.message.txt');
     logger.info(`Job #${buildNumber} done.`);
@@ -4649,7 +4617,6 @@ var _default = async (data, params, config, logger) => {
     (0, _utils.debug)('@relative-ci/agent could not send the data', err);
   }
 };
-
 exports["default"] = _default;
 
 /***/ }),
@@ -4661,18 +4628,13 @@ exports["default"] = _default;
 
 
 const childProcess = __webpack_require__(2081);
-
 const {
   pick
 } = __webpack_require__(8784);
-
 const envCI = __webpack_require__(7704);
-
 const CI_ENV_VAR_NAMES = ['branch', 'build', 'buildUrl', 'commit', 'isCi', 'pr', 'prBranch', 'service', 'slug'];
 module.exports.debug = __webpack_require__(1241)('relative-ci:agent');
-
 module.exports.getCommitMessage = () => childProcess.execSync('git log -1 --pretty=%B').toString().trim();
-
 module.exports.getEnvCI = () => pick(envCI(), CI_ENV_VAR_NAMES);
 
 /***/ }),
@@ -7888,10 +7850,10 @@ module.exports = function (exec, SKIP_CLOSING) {
 /***/ 2306:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-var uncurryThisRaw = __webpack_require__(4130);
+var uncurryThis = __webpack_require__(8240);
 
-var toString = uncurryThisRaw({}.toString);
-var stringSlice = uncurryThisRaw(''.slice);
+var toString = uncurryThis({}.toString);
+var stringSlice = uncurryThis(''.slice);
 
 module.exports = function (it) {
   return stringSlice(toString(it), 8, -1);
@@ -8311,7 +8273,7 @@ module.exports = typeof Reflect == 'object' && Reflect.apply || (NATIVE_BIND ? c
 /***/ 8516:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-var uncurryThis = __webpack_require__(8240);
+var uncurryThis = __webpack_require__(1175);
 var aCallable = __webpack_require__(5089);
 var NATIVE_BIND = __webpack_require__(6059);
 
@@ -8381,19 +8343,17 @@ module.exports = {
 
 /***/ }),
 
-/***/ 4130:
+/***/ 1175:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-var NATIVE_BIND = __webpack_require__(6059);
-
-var FunctionPrototype = Function.prototype;
-var call = FunctionPrototype.call;
-var uncurryThisWithBind = NATIVE_BIND && FunctionPrototype.bind.bind(call, call);
+var classofRaw = __webpack_require__(2306);
+var uncurryThis = __webpack_require__(8240);
 
 module.exports = function (fn) {
-  return NATIVE_BIND ? uncurryThisWithBind(fn) : function () {
-    return call.apply(fn, arguments);
-  };
+  // Nashorn bug:
+  //   https://github.com/zloirock/core-js/issues/1128
+  //   https://github.com/zloirock/core-js/issues/1130
+  if (classofRaw(fn) === 'Function') return uncurryThis(fn);
 };
 
 
@@ -8402,14 +8362,16 @@ module.exports = function (fn) {
 /***/ 8240:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
-var classofRaw = __webpack_require__(2306);
-var uncurryThisRaw = __webpack_require__(4130);
+var NATIVE_BIND = __webpack_require__(6059);
 
-module.exports = function (fn) {
-  // Nashorn bug:
-  //   https://github.com/zloirock/core-js/issues/1128
-  //   https://github.com/zloirock/core-js/issues/1130
-  if (classofRaw(fn) === 'Function') return uncurryThisRaw(fn);
+var FunctionPrototype = Function.prototype;
+var call = FunctionPrototype.call;
+var uncurryThisWithBind = NATIVE_BIND && FunctionPrototype.bind.bind(call, call);
+
+module.exports = NATIVE_BIND ? uncurryThisWithBind : function (fn) {
+  return function () {
+    return call.apply(fn, arguments);
+  };
 };
 
 
@@ -9683,10 +9645,10 @@ var store = __webpack_require__(4489);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.25.5',
+  version: '3.26.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.25.5/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.26.1/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -40949,7 +40911,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@relative-ci/agent","version":"4.1.1","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","pretest":"npm install webpack4@npm:webpack@4.42.1","test":"jest test","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.19.3","@babel/core":"7.19.3","@babel/preset-env":"7.19.3","@types/jest":"29.1.2","eslint":"8.24.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.26.0","eslint-plugin-jest":"27.1.1","jest":"29.1.2","memory-fs":"0.5.0","webpack":"5.74.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.1.0","@bundle-stats/plugin-webpack-validate":"4.1.0","core-js":"3.25.5","cosmiconfig":"7.0.1","debug":"4.3.4","dotenv":"16.0.3","env-ci":"7.3.0","fs-extra":"10.1.0","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.6.0"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"}}');
+module.exports = JSON.parse('{"name":"@relative-ci/agent","version":"4.1.2","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","pretest":"npm install webpack4@npm:webpack@4.42.1","test":"jest test","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.19.3","@babel/core":"7.20.5","@babel/preset-env":"7.20.2","@types/jest":"29.2.3","eslint":"8.29.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.26.0","eslint-plugin-jest":"27.1.6","jest":"29.3.1","memory-fs":"0.5.0","webpack":"5.75.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.1.5","@bundle-stats/plugin-webpack-validate":"4.1.5","core-js":"3.26.1","cosmiconfig":"8.0.0","debug":"4.3.4","dotenv":"16.0.3","env-ci":"7.3.0","fs-extra":"11.1.0","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.6.2"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"}}');
 
 /***/ }),
 
@@ -41139,7 +41101,6 @@ var __awaiter = undefined && undefined.__awaiter || function (thisArg, _argument
       resolve(value);
     });
   }
-
   return new (P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
@@ -41148,7 +41109,6 @@ var __awaiter = undefined && undefined.__awaiter || function (thisArg, _argument
         reject(e);
       }
     }
-
     function rejected(value) {
       try {
         step(generator["throw"](value));
@@ -41156,29 +41116,26 @@ var __awaiter = undefined && undefined.__awaiter || function (thisArg, _argument
         reject(e);
       }
     }
-
     function step(result) {
       result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
     }
-
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 };
-
 var __generator = undefined && undefined.__generator || function (thisArg, body) {
   var _ = {
-    label: 0,
-    sent: function () {
-      if (t[0] & 1) throw t[1];
-      return t[1];
+      label: 0,
+      sent: function () {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      },
+      trys: [],
+      ops: []
     },
-    trys: [],
-    ops: []
-  },
-      f,
-      y,
-      t,
-      g;
+    f,
+    y,
+    t,
+    g;
   return g = {
     next: verb(0),
     "throw": verb(1),
@@ -41186,78 +41143,59 @@ var __generator = undefined && undefined.__generator || function (thisArg, body)
   }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
     return this;
   }), g;
-
   function verb(n) {
     return function (v) {
       return step([n, v]);
     };
   }
-
   function step(op) {
     if (f) throw new TypeError("Generator is already executing.");
-
-    while (_) try {
+    while (g && (g = 0, op[0] && (_ = 0)), _) try {
       if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
       if (y = 0, t) op = [op[0] & 2, t.value];
-
       switch (op[0]) {
         case 0:
         case 1:
           t = op;
           break;
-
         case 4:
           _.label++;
           return {
             value: op[1],
             done: false
           };
-
         case 5:
           _.label++;
           y = op[1];
           op = [0];
           continue;
-
         case 7:
           op = _.ops.pop();
-
           _.trys.pop();
-
           continue;
-
         default:
           if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
             _ = 0;
             continue;
           }
-
           if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
             _.label = op[1];
             break;
           }
-
           if (op[0] === 6 && _.label < t[1]) {
             _.label = t[1];
             t = op;
             break;
           }
-
           if (t && _.label < t[2]) {
             _.label = t[2];
-
             _.ops.push(op);
-
             break;
           }
-
           if (t[2]) _.ops.pop();
-
           _.trys.pop();
-
           continue;
       }
-
       op = body.call(thisArg, _);
     } catch (e) {
       op = [6, e];
@@ -41265,7 +41203,6 @@ var __generator = undefined && undefined.__generator || function (thisArg, body)
     } finally {
       f = t = 0;
     }
-
     if (op[0] & 5) throw op[1];
     return {
       value: op[0] ? op[1] : void 0,
@@ -41274,11 +41211,9 @@ var __generator = undefined && undefined.__generator || function (thisArg, body)
   }
 };
 
-
 var logger = core;
 function getGitHubCommitMessage(params) {
   var _a, _b;
-
   return __awaiter(this, void 0, void 0, function () {
     var octokit, owner, repo, ref, commitMessage, res, err_1;
     return __generator(this, function (_c) {
@@ -41287,37 +41222,24 @@ function getGitHubCommitMessage(params) {
           octokit = params.octokit, owner = params.owner, repo = params.repo, ref = params.ref;
           logger.debug("Fetching commit message");
           _c.label = 1;
-
         case 1:
           _c.trys.push([1, 3,, 4]);
-
-          return [4
-          /*yield*/
-          , octokit.rest.repos.getCommit({
+          return [4 /*yield*/, octokit.rest.repos.getCommit({
             owner: owner,
             repo: repo,
             ref: ref
           })];
-
         case 2:
           res = _c.sent();
           commitMessage = (_b = (_a = res === null || res === void 0 ? void 0 : res.data) === null || _a === void 0 ? void 0 : _a.commit) === null || _b === void 0 ? void 0 : _b.message;
-          return [3
-          /*break*/
-          , 4];
-
+          return [3 /*break*/, 4];
         case 3:
           err_1 = _c.sent();
           logger.debug("Error fetching commit message: ".concat(err_1.message));
           logger.warning(err_1);
-          return [3
-          /*break*/
-          , 4];
-
+          return [3 /*break*/, 4];
         case 4:
-          return [2
-          /*return*/
-          , commitMessage];
+          return [2 /*return*/, commitMessage];
       }
     });
   });
@@ -41329,7 +41251,6 @@ var artifacts_awaiter = undefined && undefined.__awaiter || function (thisArg, _
       resolve(value);
     });
   }
-
   return new (P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
@@ -41338,7 +41259,6 @@ var artifacts_awaiter = undefined && undefined.__awaiter || function (thisArg, _
         reject(e);
       }
     }
-
     function rejected(value) {
       try {
         step(generator["throw"](value));
@@ -41346,29 +41266,26 @@ var artifacts_awaiter = undefined && undefined.__awaiter || function (thisArg, _
         reject(e);
       }
     }
-
     function step(result) {
       result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
     }
-
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 };
-
 var artifacts_generator = undefined && undefined.__generator || function (thisArg, body) {
   var _ = {
-    label: 0,
-    sent: function () {
-      if (t[0] & 1) throw t[1];
-      return t[1];
+      label: 0,
+      sent: function () {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      },
+      trys: [],
+      ops: []
     },
-    trys: [],
-    ops: []
-  },
-      f,
-      y,
-      t,
-      g;
+    f,
+    y,
+    t,
+    g;
   return g = {
     next: verb(0),
     "throw": verb(1),
@@ -41376,78 +41293,59 @@ var artifacts_generator = undefined && undefined.__generator || function (thisAr
   }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
     return this;
   }), g;
-
   function verb(n) {
     return function (v) {
       return step([n, v]);
     };
   }
-
   function step(op) {
     if (f) throw new TypeError("Generator is already executing.");
-
-    while (_) try {
+    while (g && (g = 0, op[0] && (_ = 0)), _) try {
       if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
       if (y = 0, t) op = [op[0] & 2, t.value];
-
       switch (op[0]) {
         case 0:
         case 1:
           t = op;
           break;
-
         case 4:
           _.label++;
           return {
             value: op[1],
             done: false
           };
-
         case 5:
           _.label++;
           y = op[1];
           op = [0];
           continue;
-
         case 7:
           op = _.ops.pop();
-
           _.trys.pop();
-
           continue;
-
         default:
           if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
             _ = 0;
             continue;
           }
-
           if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
             _.label = op[1];
             break;
           }
-
           if (op[0] === 6 && _.label < t[1]) {
             _.label = t[1];
             t = op;
             break;
           }
-
           if (t && _.label < t[2]) {
             _.label = t[2];
-
             _.ops.push(op);
-
             break;
           }
-
           if (t[2]) _.ops.pop();
-
           _.trys.pop();
-
           continue;
       }
-
       op = body.call(thisArg, _);
     } catch (e) {
       op = [6, e];
@@ -41455,7 +41353,6 @@ var artifacts_generator = undefined && undefined.__generator || function (thisAr
     } finally {
       f = t = 0;
     }
-
     if (op[0] & 5) throw op[1];
     return {
       value: op[0] ? op[1] : void 0,
@@ -41463,7 +41360,6 @@ var artifacts_generator = undefined && undefined.__generator || function (thisAr
     };
   }
 };
-
 
 
 
@@ -41481,22 +41377,16 @@ function getWebpackStatsFromFile(basedir, filepath) {
           readFile = (0,external_util_.promisify)(external_fs_.readFile);
           absoluteFilepath = external_path_.join(basedir, filepath);
           logger.debug("Read webpack stats from ".concat(absoluteFilepath));
-          return [4
-          /*yield*/
-          , readFile(absoluteFilepath, 'utf-8')];
-
+          return [4 /*yield*/, readFile(absoluteFilepath, 'utf-8')];
         case 1:
           jsonData = _a.sent();
-          return [2
-          /*return*/
-          , JSON.parse(jsonData)];
+          return [2 /*return*/, JSON.parse(jsonData)];
       }
     });
   });
 }
 function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebpackStatsFile) {
   var _a, _b, _c;
-
   return artifacts_awaiter(this, void 0, void 0, function () {
     var artifactName, artifactWebpackStatsFile, context, runId, api, workflowRunArtifactsParams, artifacts, matchArtifact, download, zip, webpackStats;
     return artifacts_generator(this, function (_d) {
@@ -41507,11 +41397,9 @@ function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebp
           logger.debug("Extract webpack stats from '".concat(artifactName, "/").concat(artifactWebpackStatsFile, "' "));
           context = github.context;
           runId = (_b = (_a = context === null || context === void 0 ? void 0 : context.payload) === null || _a === void 0 ? void 0 : _a.workflow_run) === null || _b === void 0 ? void 0 : _b.id;
-
           if (!runId) {
             throw new Error("Worflow 'runId' is missing! Please make sure your worklow is set up correctly.");
           }
-
           api = github.getOctokit(token);
           workflowRunArtifactsParams = {
             owner: context.repo.owner,
@@ -41519,48 +41407,34 @@ function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebp
             run_id: runId
           };
           logger.debug("Download artifacts for ".concat(JSON.stringify(workflowRunArtifactsParams)));
-          return [4
-          /*yield*/
-          , api.rest.actions.listWorkflowRunArtifacts(workflowRunArtifactsParams)];
-
+          return [4 /*yield*/, api.rest.actions.listWorkflowRunArtifacts(workflowRunArtifactsParams)];
         case 1:
           artifacts = _d.sent();
           matchArtifact = (_c = artifacts === null || artifacts === void 0 ? void 0 : artifacts.data) === null || _c === void 0 ? void 0 : _c.artifacts.find(function (artifact) {
             return artifact.name === artifactName;
           });
-
           if (!matchArtifact) {
             throw new Error("Artifact '".concat(artifactName, "' could not be found! Please make sure 'artifactName' is correct."));
           }
-
           logger.debug("Download artifact ".concat(matchArtifact.id));
-          return [4
-          /*yield*/
-          , api.rest.actions.downloadArtifact({
+          return [4 /*yield*/, api.rest.actions.downloadArtifact({
             owner: context.repo.owner,
             repo: context.repo.repo,
             artifact_id: matchArtifact.id,
             archive_format: 'zip'
           })];
-
         case 2:
           download = _d.sent();
-
           if (!download) {
             throw new Error("Artifact '".concat(artifactName, "(id: ").concat(matchArtifact.id, ") could not be downloaded. Please try again!"));
           }
-
           zip = new adm_zip(Buffer.from(download.data));
           logger.debug("Read artifact '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive"));
           webpackStats = zip.readAsText(artifactWebpackStatsFile, 'utf-8');
-
           if (!webpackStats) {
             throw new Error("Unable to unzip '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive.\n       Please make sure the value of 'artifactWebpackStatsFile' is correct.\n    "));
           }
-
-          return [2
-          /*return*/
-          , JSON.parse(webpackStats)];
+          return [2 /*return*/, JSON.parse(webpackStats)];
       }
     });
   });
@@ -41572,7 +41446,6 @@ var params_awaiter = undefined && undefined.__awaiter || function (thisArg, _arg
       resolve(value);
     });
   }
-
   return new (P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
@@ -41581,7 +41454,6 @@ var params_awaiter = undefined && undefined.__awaiter || function (thisArg, _arg
         reject(e);
       }
     }
-
     function rejected(value) {
       try {
         step(generator["throw"](value));
@@ -41589,29 +41461,26 @@ var params_awaiter = undefined && undefined.__awaiter || function (thisArg, _arg
         reject(e);
       }
     }
-
     function step(result) {
       result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
     }
-
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 };
-
 var params_generator = undefined && undefined.__generator || function (thisArg, body) {
   var _ = {
-    label: 0,
-    sent: function () {
-      if (t[0] & 1) throw t[1];
-      return t[1];
+      label: 0,
+      sent: function () {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      },
+      trys: [],
+      ops: []
     },
-    trys: [],
-    ops: []
-  },
-      f,
-      y,
-      t,
-      g;
+    f,
+    y,
+    t,
+    g;
   return g = {
     next: verb(0),
     "throw": verb(1),
@@ -41619,78 +41488,59 @@ var params_generator = undefined && undefined.__generator || function (thisArg, 
   }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
     return this;
   }), g;
-
   function verb(n) {
     return function (v) {
       return step([n, v]);
     };
   }
-
   function step(op) {
     if (f) throw new TypeError("Generator is already executing.");
-
-    while (_) try {
+    while (g && (g = 0, op[0] && (_ = 0)), _) try {
       if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
       if (y = 0, t) op = [op[0] & 2, t.value];
-
       switch (op[0]) {
         case 0:
         case 1:
           t = op;
           break;
-
         case 4:
           _.label++;
           return {
             value: op[1],
             done: false
           };
-
         case 5:
           _.label++;
           y = op[1];
           op = [0];
           continue;
-
         case 7:
           op = _.ops.pop();
-
           _.trys.pop();
-
           continue;
-
         default:
           if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
             _ = 0;
             continue;
           }
-
           if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
             _.label = op[1];
             break;
           }
-
           if (op[0] === 6 && _.label < t[1]) {
             _.label = t[1];
             t = op;
             break;
           }
-
           if (t && _.label < t[2]) {
             _.label = t[2];
-
             _.ops.push(op);
-
             break;
           }
-
           if (t[2]) _.ops.pop();
-
           _.trys.pop();
-
           continue;
       }
-
       op = body.call(thisArg, _);
     } catch (e) {
       op = [6, e];
@@ -41698,7 +41548,6 @@ var params_generator = undefined && undefined.__generator || function (thisArg, 
     } finally {
       f = t = 0;
     }
-
     if (op[0] & 5) throw op[1];
     return {
       value: op[0] ? op[1] : void 0,
@@ -41708,14 +41557,11 @@ var params_generator = undefined && undefined.__generator || function (thisArg, 
 };
 
 
-
 /**
   * Extract params from the current ref, env-ci will handle the rest at the agent level
   */
-
 function extractParams(context) {
   var _a, _b;
-
   return {
     commitMessage: (_b = (_a = context.payload) === null || _a === void 0 ? void 0 : _a.head_commit) === null || _b === void 0 ? void 0 : _b.message
   };
@@ -41723,10 +41569,8 @@ function extractParams(context) {
 /**
   * Exctract params from the pull request event data
   */
-
 function extractPullRequestParams(context, token, includeCommitMessage) {
   var _a, _b, _c, _d;
-
   return params_awaiter(this, void 0, void 0, function () {
     var payload, repo, pullRequest, commitMessage, octokit, err_1, commit, branch, pr;
     return params_generator(this, function (_e) {
@@ -41734,54 +41578,34 @@ function extractPullRequestParams(context, token, includeCommitMessage) {
         case 0:
           payload = context.payload, repo = context.repo;
           pullRequest = payload.pull_request;
-          if (!includeCommitMessage) return [3
-          /*break*/
-          , 5];
+          if (!includeCommitMessage) return [3 /*break*/, 5];
           logger.debug("Fetching commit message for '".concat(repo.owner, "/").concat(repo.repo, "#").concat((_a = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _a === void 0 ? void 0 : _a.sha, "'"));
-          if (!!token) return [3
-          /*break*/
-          , 1];
+          if (!!token) return [3 /*break*/, 1];
           logger.error('"token" input is required when "includeCommitMessage" is true');
-          return [3
-          /*break*/
-          , 5];
-
+          return [3 /*break*/, 5];
         case 1:
           octokit = github.getOctokit(token);
           _e.label = 2;
-
         case 2:
           _e.trys.push([2, 4,, 5]);
-
-          return [4
-          /*yield*/
-          , getGitHubCommitMessage({
+          return [4 /*yield*/, getGitHubCommitMessage({
             octokit: octokit,
             owner: repo.owner,
             repo: repo.repo,
             ref: (_b = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _b === void 0 ? void 0 : _b.sha
           })];
-
         case 3:
           commitMessage = _e.sent();
-          return [3
-          /*break*/
-          , 5];
-
+          return [3 /*break*/, 5];
         case 4:
           err_1 = _e.sent();
           logger.error("Error fetching commit data: ".concat(err_1.message));
-          return [3
-          /*break*/
-          , 5];
-
+          return [3 /*break*/, 5];
         case 5:
           commit = (_c = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _c === void 0 ? void 0 : _c.sha;
           branch = (_d = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.head) === null || _d === void 0 ? void 0 : _d.ref;
           pr = pullRequest === null || pullRequest === void 0 ? void 0 : pullRequest.number;
-          return [2
-          /*return*/
-          , {
+          return [2 /*return*/, {
             commit: commit,
             branch: branch,
             pr: pr,
@@ -41794,10 +41618,8 @@ function extractPullRequestParams(context, token, includeCommitMessage) {
 /**
   * Extract params from workflow_run event data
   */
-
 function extractWorkflowRunParams(context) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
-
   return params_awaiter(this, void 0, void 0, function () {
     var payload, workflowRun, commit, commitMessage, pr, branch, headOwner;
     return params_generator(this, function (_j) {
@@ -41808,14 +41630,10 @@ function extractWorkflowRunParams(context) {
       pr = workflowRun.event === 'pull_request' ? (_d = (_c = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.pull_requests) === null || _c === void 0 ? void 0 : _c[0]) === null || _d === void 0 ? void 0 : _d.number : undefined;
       branch = workflowRun.head_branch;
       headOwner = (_f = (_e = workflowRun === null || workflowRun === void 0 ? void 0 : workflowRun.head_repository) === null || _e === void 0 ? void 0 : _e.owner) === null || _f === void 0 ? void 0 : _f.login;
-
       if (headOwner && headOwner !== ((_h = (_g = payload === null || payload === void 0 ? void 0 : payload.repository) === null || _g === void 0 ? void 0 : _g.owner) === null || _h === void 0 ? void 0 : _h.login)) {
         branch = "".concat(headOwner, ":").concat(branch);
       }
-
-      return [2
-      /*return*/
-      , {
+      return [2 /*return*/, {
         commit: commit,
         commitMessage: commitMessage,
         branch: branch,
@@ -41829,23 +41647,18 @@ var __assign = undefined && undefined.__assign || function () {
   __assign = Object.assign || function (t) {
     for (var s, i = 1, n = arguments.length; i < n; i++) {
       s = arguments[i];
-
       for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
     }
-
     return t;
   };
-
   return __assign.apply(this, arguments);
 };
-
 var index_awaiter = undefined && undefined.__awaiter || function (thisArg, _arguments, P, generator) {
   function adopt(value) {
     return value instanceof P ? value : new P(function (resolve) {
       resolve(value);
     });
   }
-
   return new (P || (P = Promise))(function (resolve, reject) {
     function fulfilled(value) {
       try {
@@ -41854,7 +41667,6 @@ var index_awaiter = undefined && undefined.__awaiter || function (thisArg, _argu
         reject(e);
       }
     }
-
     function rejected(value) {
       try {
         step(generator["throw"](value));
@@ -41862,29 +41674,26 @@ var index_awaiter = undefined && undefined.__awaiter || function (thisArg, _argu
         reject(e);
       }
     }
-
     function step(result) {
       result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
     }
-
     step((generator = generator.apply(thisArg, _arguments || [])).next());
   });
 };
-
 var index_generator = undefined && undefined.__generator || function (thisArg, body) {
   var _ = {
-    label: 0,
-    sent: function () {
-      if (t[0] & 1) throw t[1];
-      return t[1];
+      label: 0,
+      sent: function () {
+        if (t[0] & 1) throw t[1];
+        return t[1];
+      },
+      trys: [],
+      ops: []
     },
-    trys: [],
-    ops: []
-  },
-      f,
-      y,
-      t,
-      g;
+    f,
+    y,
+    t,
+    g;
   return g = {
     next: verb(0),
     "throw": verb(1),
@@ -41892,78 +41701,59 @@ var index_generator = undefined && undefined.__generator || function (thisArg, b
   }, typeof Symbol === "function" && (g[Symbol.iterator] = function () {
     return this;
   }), g;
-
   function verb(n) {
     return function (v) {
       return step([n, v]);
     };
   }
-
   function step(op) {
     if (f) throw new TypeError("Generator is already executing.");
-
-    while (_) try {
+    while (g && (g = 0, op[0] && (_ = 0)), _) try {
       if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
       if (y = 0, t) op = [op[0] & 2, t.value];
-
       switch (op[0]) {
         case 0:
         case 1:
           t = op;
           break;
-
         case 4:
           _.label++;
           return {
             value: op[1],
             done: false
           };
-
         case 5:
           _.label++;
           y = op[1];
           op = [0];
           continue;
-
         case 7:
           op = _.ops.pop();
-
           _.trys.pop();
-
           continue;
-
         default:
           if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
             _ = 0;
             continue;
           }
-
           if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
             _.label = op[1];
             break;
           }
-
           if (op[0] === 6 && _.label < t[1]) {
             _.label = t[1];
             t = op;
             break;
           }
-
           if (t && _.label < t[2]) {
             _.label = t[2];
-
             _.ops.push(op);
-
             break;
           }
-
           if (t[2]) _.ops.pop();
-
           _.trys.pop();
-
           continue;
       }
-
       op = body.call(thisArg, _);
     } catch (e) {
       op = [6, e];
@@ -41971,7 +41761,6 @@ var index_generator = undefined && undefined.__generator || function (thisArg, b
     } finally {
       f = t = 0;
     }
-
     if (op[0] & 5) throw op[1];
     return {
       value: op[0] ? op[1] : void 0,
@@ -41985,11 +41774,9 @@ var index_generator = undefined && undefined.__generator || function (thisArg, b
 
 
 
-
 var _a = process.env,
-    ACTIONS_STEP_DEBUG = _a.ACTIONS_STEP_DEBUG,
-    GITHUB_WORKSPACE = _a.GITHUB_WORKSPACE;
-
+  ACTIONS_STEP_DEBUG = _a.ACTIONS_STEP_DEBUG,
+  GITHUB_WORKSPACE = _a.GITHUB_WORKSPACE;
 function run() {
   return index_awaiter(this, void 0, void 0, function () {
     var token, key, slug, endpoint, webpackStatsFile, artifactName, includeCommitMessage, debug, eventName, agentParams, webpackStats, err_1;
@@ -41997,7 +41784,6 @@ function run() {
       switch (_a.label) {
         case 0:
           _a.trys.push([0, 11,, 12]);
-
           token = core.getInput('token');
           key = core.getInput('key');
           slug = core.getInput('slug');
@@ -42008,82 +41794,49 @@ function run() {
           debug = core.getInput('debug') === 'true';
           eventName = github.context.eventName;
           agentParams = void 0;
-          if (!(eventName === 'pull_request')) return [3
-          /*break*/
-          , 2];
+          if (!(eventName === 'pull_request')) return [3 /*break*/, 2];
           logger.debug('Extract params for pull_request flow');
-          return [4
-          /*yield*/
-          , extractPullRequestParams(github.context, token, includeCommitMessage)];
-
+          return [4 /*yield*/, extractPullRequestParams(github.context, token, includeCommitMessage)];
         case 1:
           agentParams = _a.sent();
-          return [3
-          /*break*/
-          , 5];
-
+          return [3 /*break*/, 5];
         case 2:
-          if (!(eventName === 'workflow_run')) return [3
-          /*break*/
-          , 4];
+          if (!(eventName === 'workflow_run')) return [3 /*break*/, 4];
           logger.debug('Extract params for workflow_run flow');
-          return [4
-          /*yield*/
-          , extractWorkflowRunParams(github.context)];
-
+          return [4 /*yield*/, extractWorkflowRunParams(github.context)];
         case 3:
           agentParams = _a.sent();
-          return [3
-          /*break*/
-          , 5];
-
+          return [3 /*break*/, 5];
         case 4:
           logger.debug('Extract params for default flow');
           agentParams = extractParams(github.context);
           _a.label = 5;
-
         case 5:
           logger.debug("Agent params: ".concat(JSON.stringify(agentParams)));
           webpackStats = {};
-          if (!(eventName === 'workflow_run')) return [3
-          /*break*/
-          , 7];
-          return [4
-          /*yield*/
-          , getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile)];
-
+          if (!(eventName === 'workflow_run')) return [3 /*break*/, 7];
+          return [4 /*yield*/, getWebpackStatsFromArtifact(token, artifactName, webpackStatsFile)];
         case 6:
           webpackStats = _a.sent();
-          return [3
-          /*break*/
-          , 9];
-
+          return [3 /*break*/, 9];
         case 7:
           if (!webpackStatsFile) {
             throw new Error('`webpackStatsFile` input is required!');
           }
-
-          return [4
-          /*yield*/
-          , getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile)];
-
+          return [4 /*yield*/, getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile)];
         case 8:
           webpackStats = _a.sent();
           _a.label = 9;
-
         case 9:
           // Set RelativeCI service key
           // @TODO pass it as an argument to agent
           process.env.RELATIVE_CI_KEY = key;
-          process.env.RELATIVE_CI_ENDPOINT = endpoint; // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
-
+          process.env.RELATIVE_CI_ENDPOINT = endpoint;
+          // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
           if (debug || ACTIONS_STEP_DEBUG) {
             process.env.DEBUG = 'relative-ci:agent';
           }
-
-          return [4
-          /*yield*/
-          , (0,agent/* agent */.W)([{
+          return [4 /*yield*/, (0,agent/* agent */.W)([{
             key: 'webpack.stats',
             data: webpackStats
           }], {
@@ -42091,25 +41844,15 @@ function run() {
           }, __assign({
             slug: slug
           }, agentParams))];
-
         case 10:
           _a.sent();
-
-          return [3
-          /*break*/
-          , 12];
-
+          return [3 /*break*/, 12];
         case 11:
           err_1 = _a.sent();
           core.setFailed(err_1);
-          return [3
-          /*break*/
-          , 12];
-
+          return [3 /*break*/, 12];
         case 12:
-          return [2
-          /*return*/
-          ];
+          return [2 /*return*/];
       }
     });
   });
