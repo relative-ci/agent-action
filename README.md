@@ -1,6 +1,6 @@
 # RelativeCI agent
 
-GitHub action that sends webpack stats and CI build information to [RelativeCI](https://relative-ci.com).
+GitHub action that sends bundle stats and CI build information to [RelativeCI](https://relative-ci.com).
 
 - [RelativeCI Setup guide](https://relative-ci.com/documentation/setup)
 - [RelativeCI GitHub action guide](https://relative-ci.com/documentation/setup/agent/github-action)
@@ -33,19 +33,19 @@ on:
 jobs:
   build:
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '18.x'
 
       # Install dependencies
       - run: npm ci
 
-      # Build bundle and output webpack stats
-      # see https://relative-ci.com/documentation/setup/agent/github-action/#step-1-output-webpack-stats
+      # Build and output bundle stats
+      # see https://relative-ci.com/documentation/setup/agent/github-action/#step-1-output-bundle-stats-json-file
       - run: npm run build -- --json webpack-stats
       
-      - name: Send webpack stats to RelativeCI
+      - name: Send bundle stats to RelativeCI
         uses: relative-ci/agent-action@v2
         with:
           key: ${{ secrets.RELATIVE_CI_KEY }}
@@ -55,9 +55,9 @@ jobs:
 
 ### `workflow_run` events
 
-[Read more about workflows triggered by forked repositories](https://relative-ci.com/documentation/setup/agent/github-action/).
+[Read more about workflows triggered by forked repositories](https://relative-ci.com/documentation/setup/agent/github-action/#workflow_run-event).
 
-#### Build and upload webpack stats artifacts using [relative-ci/agent-upload-artifact-action](https://github.com/relative-ci/agent-upload-artifact-action)
+#### Build and upload bundle stats artifacts using [relative-ci/agent-upload-artifact-action](https://github.com/relative-ci/agent-upload-artifact-action)
 
 ```yaml
 # .github/workflows/build.yaml
@@ -73,27 +73,27 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '18.x'
 
       # Install dependencies
       - run: npm ci
 
-      # Build and output webpack stats to webpack-stats.json
+      # Build and output bundle stats to webpack-stats.json
       - run: npm run build --json webpack-stats.json
 
       # Upload webpack-stats.json to use on relative-ci.yaml workflow
-      - name: Upload webpack stats artifact
+      - name: Upload bundle stats artifact
         uses: relative-ci/agent-upload-artifact-action@v1
         with:
           webpackStatsFile: ./webpack-stats.json
 ```
 
-### Send webpack stats and build information to RelativeCI 
+### Send bundle stats and build information to RelativeCI 
 
-The workflow runs securely in the default branch context(ex: `main`). `relative-ci/agent-action` uses the build information (commit, message, branch) from the depending workflow (ex: `Builds`).
+The workflow runs securely in the default branch context(ex: `main`). `relative-ci/agent-action` uses the build information (commit, message, branch) corresponding to the commit that triggerd the `Build` workflow.
 
 ```yaml
 # .github/workflows/relative-ci.yaml
@@ -109,7 +109,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Send webpack stats to RelativeCI
+      - name: Send bundle stats and build information to RelativeCI
         uses: relative-ci/agent-action@v2
         with:
           key: ${{ secrets.RELATIVE_CI_KEY }}
@@ -128,7 +128,7 @@ jobs:
 
 ### `webpackStatsFile`
 
-**Required** (only when running during `push` or `pull_request` events) Path to webpack stats file
+**Required** (only when running during `push` or `pull_request` events) Path to the bundle stats file
 
 ### Optional
 
@@ -154,13 +154,13 @@ Enable debug output
 
 Default: `relative-ci-artifacts` when running during `workflow_run` event
 
-The name of the artifact with webpack stats uploaded by another workflow
+The name of the artifact that containts the bundle stats uploaded by the triggering workflow
 
 #### `artifactWebpackStatsFile` 
 
 Default: `webpack-stats.json` when running during `workflow_run` event
 
-The artifact webpack stats file path
+The artifact bundle stats file path
 
 ## Secrets
 

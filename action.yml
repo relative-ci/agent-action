@@ -11,7 +11,7 @@ inputs:
     description: 'RelativeCI project key'
     required: true
   webpackStatsFile:
-    description: 'Path to your local webpack stats file'
+    description: 'Path to your local bundle stats file'
     required: false
   slug:
     description: 'RelativeCI project slug'
@@ -31,7 +31,7 @@ inputs:
     description: 'Artifact to download when running in workflow_run'
     required: false
   artifactWebpackStatsFile:
-    description: 'Artifact webpack stats file path'
+    description: 'Artifact bundle stats file path'
     required: false
 runs:
   using: 'node16'
