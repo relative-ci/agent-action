@@ -4455,6 +4455,11 @@ var _utils = __webpack_require__(6531);
 function _getRequireWildcardCache(nodeInterop) { if (typeof WeakMap !== "function") return null; var cacheBabelInterop = new WeakMap(); var cacheNodeInterop = new WeakMap(); return (_getRequireWildcardCache = function (nodeInterop) { return nodeInterop ? cacheNodeInterop : cacheBabelInterop; })(nodeInterop); }
 function _interopRequireWildcard(obj, nodeInterop) { if (!nodeInterop && obj && obj.__esModule) { return obj; } if (obj === null || typeof obj !== "object" && typeof obj !== "function") { return { default: obj }; } var cache = _getRequireWildcardCache(nodeInterop); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (key !== "default" && Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj.default = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+/**
+ * @typedef {import('../').AgentConfig} AgentConfig
+ * @typedef {import('../').AgentArgs} AgentArgs
+ */
+
 const DEFAULT_ENDPOINT = 'https://api.relative-ci.com/save';
 const WEBPACK_STATS = 'webpack.stats';
 const SOURCE_EXTRACTORS = {
@@ -4465,6 +4470,14 @@ const getFilteredData = artifactsData => artifactsData.reduce((agg, {
   data,
   options
 }) => (0, _lodash.set)(agg, key, SOURCE_EXTRACTORS[key](data, options)), {});
+
+/**
+ * @param {Array<object>} artifactsData
+ * @param {AgentConfig} config
+ * @param {AgentArgs} [args]
+ * @param {Console} [logger]
+ * @return {void|Promise<void>}
+ */
 const agent = (artifactsData, config, args = {}, logger = console) => {
   _dotenv.default.config();
   const envCIVars = (0, _utils.getEnvCI)();
@@ -4488,12 +4501,12 @@ const agent = (artifactsData, config, args = {}, logger = console) => {
     includeCommitMessage
   } = config;
   const params = {
+    agentVersion: _package.default.version,
     key: process.env.RELATIVE_CI_KEY,
     endpoint: process.env.RELATIVE_CI_ENDPOINT || DEFAULT_ENDPOINT,
-    agentVersion: _package.default.version,
     ...envVars,
     // Get commit message using git if includeCommitMessage is set and
-    // there is no --commit-messagecommit
+    // there is no --commit-message argument
     ...(includeCommitMessage && !args.commitMessage && {
       commitMessage: (0, _utils.getCommitMessage)()
     })
@@ -4627,6 +4640,9 @@ exports["default"] = _default;
 "use strict";
 
 
+/**
+ * @typedef {import('../').EnvCI} EnvCI
+ */
 const childProcess = __webpack_require__(2081);
 const {
   pick
@@ -4635,7 +4651,48 @@ const envCI = __webpack_require__(7704);
 const CI_ENV_VAR_NAMES = ['branch', 'build', 'buildUrl', 'commit', 'isCi', 'pr', 'prBranch', 'service', 'slug'];
 module.exports.debug = __webpack_require__(1241)('relative-ci:agent');
 module.exports.getCommitMessage = () => childProcess.execSync('git log -1 --pretty=%B').toString().trim();
-module.exports.getEnvCI = () => pick(envCI(), CI_ENV_VAR_NAMES);
+
+// Match slug on `git@github.com:relative-ci/agent.git`
+const GIT_SSH_URL_SLUG_PATTERN = /^git@(?:.*):(.*)\.git$/;
+
+// Match slug on `/relative-ci/agent.git`
+const GIT_PATHNAME_SLUG_PATTERN = /^\/(.*)\.git$/;
+
+/**
+ * Extract repository slug(owner/repo) from the repo URL
+ *
+ * @param {string} repoURL
+ * @returns {string}
+ */
+const extractRepoSlug = repoURL => {
+  if (!repoURL) {
+    return '';
+  }
+  if (repoURL.match(/^git@/)) {
+    return repoURL.replace(GIT_SSH_URL_SLUG_PATTERN, '$1');
+  }
+  try {
+    const url = new URL(repoURL);
+    return url.pathname.replace(GIT_PATHNAME_SLUG_PATTERN, '$1');
+  } catch (err) {
+    console.warn(err.message);
+    return '';
+  }
+};
+module.exports.getEnvCI = () => {
+  /** @type {EnvCI} */
+  const envVars = pick(envCI(), CI_ENV_VAR_NAMES);
+
+  // env-ci does not provide a slug for jenkins
+  // https://github.com/semantic-release/env-ci/blob/master/services/jenkins.js#LL18
+  // https://www.jenkins.io/doc/book/pipeline/jenkinsfile/#using-environment-variables
+  // https://plugins.jenkins.io/git/#plugin-content-environment-variables
+  if (envVars.service === 'jenkins' && !envVars.slug) {
+    envVars.slug = extractRepoSlug(process.env.GIT_URL);
+  }
+  return envVars;
+};
+module.exports.extractRepoSlug = extractRepoSlug;
 
 /***/ }),
 
@@ -4929,8 +4986,9 @@ module.exports = function (/**String*/ input, /** object */ options) {
          * @param zipPath optional path inside zip
          * @param filter optional RegExp or Function if files match will
          *               be included.
+         * @param {number | object} attr - number as unix file permissions, object as filesystem Stats object
          */
-        addLocalFolder: function (/**String*/ localPath, /**String=*/ zipPath, /**=RegExp|Function*/ filter) {
+        addLocalFolder: function (/**String*/ localPath, /**String=*/ zipPath, /**=RegExp|Function*/ filter, /**=number|object*/ attr) {
             // Prepare filter
             if (filter instanceof RegExp) {
                 // if filter is RegExp wrap it
@@ -4962,9 +5020,9 @@ module.exports = function (/**String*/ input, /** object */ options) {
                         if (filter(p)) {
                             var stats = filetools.fs.statSync(filepath);
                             if (stats.isFile()) {
-                                self.addFile(zipPath + p, filetools.fs.readFileSync(filepath), "", stats);
+                                self.addFile(zipPath + p, filetools.fs.readFileSync(filepath), "", attr ? attr : stats);
                             } else {
-                                self.addFile(zipPath + p + "/", Buffer.alloc(0), "", stats);
+                                self.addFile(zipPath + p + "/", Buffer.alloc(0), "", attr ? attr : stats);
                             }
                         }
                     });
@@ -5038,7 +5096,9 @@ module.exports = function (/**String*/ input, /** object */ options) {
                                     }
                                 });
                             } else {
-                                next();
+                                process.nextTick(() => {
+                                    next();
+                                });
                             }
                         } else {
                             callback(true, undefined);
@@ -5104,23 +5164,21 @@ module.exports = function (/**String*/ input, /** object */ options) {
             var fileattr = entry.isDirectory ? 0x10 : 0; // (MS-DOS directory flag)
 
             // extended attributes field for Unix
-            if (!Utils.isWin) {
-                // set file type either S_IFDIR / S_IFREG
-                let unix = entry.isDirectory ? 0x4000 : 0x8000;
+            // set file type either S_IFDIR / S_IFREG
+            let unix = entry.isDirectory ? 0x4000 : 0x8000;
 
-                if (isStat) {
-                    // File attributes from file stats
-                    unix |= 0xfff & attr.mode;
-                } else if ("number" === typeof attr) {
-                    // attr from given attr values
-                    unix |= 0xfff & attr;
-                } else {
-                    // Default values:
-                    unix |= entry.isDirectory ? 0o755 : 0o644; // permissions (drwxr-xr-x) or (-r-wr--r--)
-                }
-
-                fileattr = (fileattr | (unix << 16)) >>> 0; // add attributes
+            if (isStat) {
+                // File attributes from file stats
+                unix |= 0xfff & attr.mode;
+            } else if ("number" === typeof attr) {
+                // attr from given attr values
+                unix |= 0xfff & attr;
+            } else {
+                // Default values:
+                unix |= entry.isDirectory ? 0o755 : 0o644; // permissions (drwxr-xr-x) or (-r-wr--r--)
             }
+
+            fileattr = (fileattr | (unix << 16)) >>> 0; // add attributes
 
             entry.attr = fileattr;
 
@@ -5296,12 +5354,14 @@ module.exports = function (/**String*/ input, /** object */ options) {
          * @param callback The callback will be executed when all entries are extracted successfully or any error is thrown.
          */
         extractAllToAsync: function (/**String*/ targetPath, /**Boolean*/ overwrite, /**Boolean*/ keepOriginalPermission, /**Function*/ callback) {
-            if (!callback) {
-                callback = function () {};
-            }
             overwrite = get_Bool(overwrite, false);
             if (typeof keepOriginalPermission === "function" && !callback) callback = keepOriginalPermission;
             keepOriginalPermission = get_Bool(keepOriginalPermission, false);
+            if (!callback) {
+                callback = function (err) {
+                    throw new Error(err);
+                };
+            }
             if (!_zip) {
                 callback(new Error(Utils.Errors.NO_ZIP));
                 return;
@@ -5883,7 +5943,7 @@ module.exports = function () {
                 // total number of entries
                 _totalEntries = Utils.readBigUInt64LE(data, Constants.ZIP64TOT);
                 // central directory size in bytes
-                _size = Utils.readBigUInt64LE(data, Constants.ZIP64SIZ);
+                _size = Utils.readBigUInt64LE(data, Constants.ZIP64SIZE);
                 // offset of first CEN header
                 _offset = Utils.readBigUInt64LE(data, Constants.ZIP64OFF);
 
@@ -5934,7 +5994,7 @@ module.exports = function () {
         }
     };
 };
-
+ // Misspelled 
 
 /***/ }),
 
@@ -6516,6 +6576,7 @@ module.exports.FileAttr = __webpack_require__(5348);
 const fsystem = (__webpack_require__(7930).require)();
 const pth = __webpack_require__(1017);
 const Constants = __webpack_require__(6708);
+const Errors = __webpack_require__(8310);
 const isWin = typeof process === "object" && "win32" === process.platform;
 
 const is_Obj = (obj) => obj && typeof obj === "object";
@@ -7953,6 +8014,21 @@ module.exports = function (bitmap, value) {
 
 /***/ }),
 
+/***/ 8371:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var makeBuiltIn = __webpack_require__(3712);
+var defineProperty = __webpack_require__(7826);
+
+module.exports = function (target, name, descriptor) {
+  if (descriptor.get) makeBuiltIn(descriptor.get, name, { getter: true });
+  if (descriptor.set) makeBuiltIn(descriptor.set, name, { setter: true });
+  return defineProperty.f(target, name, descriptor);
+};
+
+
+/***/ }),
+
 /***/ 1343:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -8026,6 +8102,7 @@ module.exports = !fails(function () {
 var documentAll = typeof document == 'object' && document.all;
 
 // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
+// eslint-disable-next-line unicorn/no-typeof-undefined -- required for testing
 var IS_HTMLDDA = typeof documentAll == 'undefined' && documentAll !== undefined;
 
 module.exports = {
@@ -8079,9 +8156,8 @@ module.exports = typeof Deno == 'object' && Deno && typeof Deno.version == 'obje
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var userAgent = __webpack_require__(4999);
-var global = __webpack_require__(2086);
 
-module.exports = /ipad|iphone|ipod/i.test(userAgent) && global.Pebble !== undefined;
+module.exports = /ipad|iphone|ipod/i.test(userAgent) && typeof Pebble != 'undefined';
 
 
 /***/ }),
@@ -8091,6 +8167,7 @@ module.exports = /ipad|iphone|ipod/i.test(userAgent) && global.Pebble !== undefi
 
 var userAgent = __webpack_require__(4999);
 
+// eslint-disable-next-line redos/no-vulnerable -- safe
 module.exports = /(?:ipad|iphone|ipod).*applewebkit/i.test(userAgent);
 
 
@@ -8100,9 +8177,8 @@ module.exports = /(?:ipad|iphone|ipod).*applewebkit/i.test(userAgent);
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var classof = __webpack_require__(2306);
-var global = __webpack_require__(2086);
 
-module.exports = classof(global.process) == 'process';
+module.exports = typeof process != 'undefined' && classof(process) == 'process';
 
 
 /***/ }),
@@ -8118,11 +8194,9 @@ module.exports = /web0s(?!.*chrome)/i.test(userAgent);
 /***/ }),
 
 /***/ 4999:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+/***/ ((module) => {
 
-var getBuiltIn = __webpack_require__(563);
-
-module.exports = getBuiltIn('navigator', 'userAgent') || '';
+module.exports = typeof navigator != 'undefined' && String(navigator.userAgent) || '';
 
 
 /***/ }),
@@ -8343,6 +8417,22 @@ module.exports = {
 
 /***/ }),
 
+/***/ 1518:
+/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
+
+var uncurryThis = __webpack_require__(8240);
+var aCallable = __webpack_require__(5089);
+
+module.exports = function (object, key, method) {
+  try {
+    // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
+    return uncurryThis(aCallable(Object.getOwnPropertyDescriptor(object, key)[method]));
+  } catch (error) { /* empty */ }
+};
+
+
+/***/ }),
+
 /***/ 1175:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
@@ -8498,15 +8588,13 @@ module.exports = {};
 /***/ }),
 
 /***/ 1670:
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-var global = __webpack_require__(2086);
+/***/ ((module) => {
 
 module.exports = function (a, b) {
-  var console = global.console;
-  if (console && console.error) {
+  try {
+    // eslint-disable-next-line no-console -- safe
     arguments.length == 1 ? console.error(a) : console.error(a, b);
-  }
+  } catch (error) { /* empty */ }
 };
 
 
@@ -8970,6 +9058,7 @@ module.exports = function (obj) {
 /***/ 3712:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
+var uncurryThis = __webpack_require__(8240);
 var fails = __webpack_require__(3677);
 var isCallable = __webpack_require__(930);
 var hasOwn = __webpack_require__(9606);
@@ -8980,8 +9069,12 @@ var InternalStateModule = __webpack_require__(3278);
 
 var enforceInternalState = InternalStateModule.enforce;
 var getInternalState = InternalStateModule.get;
+var $String = String;
 // eslint-disable-next-line es/no-object-defineproperty -- safe
 var defineProperty = Object.defineProperty;
+var stringSlice = uncurryThis(''.slice);
+var replace = uncurryThis(''.replace);
+var join = uncurryThis([].join);
 
 var CONFIGURABLE_LENGTH = DESCRIPTORS && !fails(function () {
   return defineProperty(function () { /* empty */ }, 'length', { value: 8 }).length !== 8;
@@ -8990,8 +9083,8 @@ var CONFIGURABLE_LENGTH = DESCRIPTORS && !fails(function () {
 var TEMPLATE = String(String).split('String');
 
 var makeBuiltIn = module.exports = function (value, name, options) {
-  if (String(name).slice(0, 7) === 'Symbol(') {
-    name = '[' + String(name).replace(/^Symbol\(([^)]*)\)/, '$1') + ']';
+  if (stringSlice($String(name), 0, 7) === 'Symbol(') {
+    name = '[' + replace($String(name), /^Symbol\(([^)]*)\)/, '$1') + ']';
   }
   if (options && options.getter) name = 'get ' + name;
   if (options && options.setter) name = 'set ' + name;
@@ -9010,7 +9103,7 @@ var makeBuiltIn = module.exports = function (value, name, options) {
   } catch (error) { /* empty */ }
   var state = enforceInternalState(value);
   if (!hasOwn(state, 'source')) {
-    state.source = TEMPLATE.join(typeof name == 'string' ? name : '');
+    state.source = join(TEMPLATE, typeof name == 'string' ? name : '');
   } return value;
 };
 
@@ -9047,6 +9140,7 @@ var global = __webpack_require__(2086);
 var bind = __webpack_require__(8516);
 var getOwnPropertyDescriptor = (__webpack_require__(4399).f);
 var macrotask = (__webpack_require__(4953).set);
+var Queue = __webpack_require__(7733);
 var IS_IOS = __webpack_require__(4344);
 var IS_IOS_PEBBLE = __webpack_require__(1848);
 var IS_WEBOS_WEBKIT = __webpack_require__(4928);
@@ -9058,26 +9152,22 @@ var process = global.process;
 var Promise = global.Promise;
 // Node.js 11 shows ExperimentalWarning on getting `queueMicrotask`
 var queueMicrotaskDescriptor = getOwnPropertyDescriptor(global, 'queueMicrotask');
-var queueMicrotask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
-
-var flush, head, last, notify, toggle, node, promise, then;
+var microtask = queueMicrotaskDescriptor && queueMicrotaskDescriptor.value;
+var notify, toggle, node, promise, then;
 
 // modern engines have queueMicrotask method
-if (!queueMicrotask) {
-  flush = function () {
+if (!microtask) {
+  var queue = new Queue();
+
+  var flush = function () {
     var parent, fn;
     if (IS_NODE && (parent = process.domain)) parent.exit();
-    while (head) {
-      fn = head.fn;
-      head = head.next;
-      try {
-        fn();
-      } catch (error) {
-        if (head) notify();
-        else last = undefined;
-        throw error;
-      }
-    } last = undefined;
+    while (fn = queue.get()) try {
+      fn();
+    } catch (error) {
+      if (queue.head) notify();
+      throw error;
+    }
     if (parent) parent.enter();
   };
 
@@ -9112,22 +9202,20 @@ if (!queueMicrotask) {
   // - onreadystatechange
   // - setTimeout
   } else {
-    // strange IE + webpack dev server bug - use .bind(global)
+    // `webpack` dev server bug on IE global methods - use bind(fn, global)
     macrotask = bind(macrotask, global);
     notify = function () {
       macrotask(flush);
     };
   }
+
+  microtask = function (fn) {
+    if (!queue.head) notify();
+    queue.add(fn);
+  };
 }
 
-module.exports = queueMicrotask || function (fn) {
-  var task = { fn: fn, next: undefined };
-  if (last) last.next = task;
-  if (!head) {
-    head = task;
-    notify();
-  } last = task;
-};
+module.exports = microtask;
 
 
 /***/ }),
@@ -9330,7 +9418,7 @@ exports.f = NASHORN_BUG ? function propertyIsEnumerable(V) {
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 /* eslint-disable no-proto -- safe */
-var uncurryThis = __webpack_require__(8240);
+var uncurryThisAccessor = __webpack_require__(1518);
 var anObject = __webpack_require__(6112);
 var aPossiblePrototype = __webpack_require__(1378);
 
@@ -9343,8 +9431,7 @@ module.exports = Object.setPrototypeOf || ('__proto__' in {} ? function () {
   var test = {};
   var setter;
   try {
-    // eslint-disable-next-line es/no-object-getownpropertydescriptor -- safe
-    setter = uncurryThis(Object.getOwnPropertyDescriptor(Object.prototype, '__proto__').set);
+    setter = uncurryThisAccessor(Object.prototype, '__proto__', 'set');
     setter(test, []);
     CORRECT_SETTER = test instanceof Array;
   } catch (error) { /* empty */ }
@@ -9525,15 +9612,16 @@ var Queue = function () {
 Queue.prototype = {
   add: function (item) {
     var entry = { item: item, next: null };
-    if (this.head) this.tail.next = entry;
+    var tail = this.tail;
+    if (tail) tail.next = entry;
     else this.head = entry;
     this.tail = entry;
   },
   get: function () {
     var entry = this.head;
     if (entry) {
-      this.head = entry.next;
-      if (this.tail === entry) this.tail = null;
+      var next = this.head = entry.next;
+      if (next === null) this.tail = null;
       return entry.item;
     }
   }
@@ -9567,7 +9655,7 @@ module.exports = function (it) {
 "use strict";
 
 var getBuiltIn = __webpack_require__(563);
-var definePropertyModule = __webpack_require__(7826);
+var defineBuiltInAccessor = __webpack_require__(8371);
 var wellKnownSymbol = __webpack_require__(211);
 var DESCRIPTORS = __webpack_require__(5283);
 
@@ -9575,10 +9663,9 @@ var SPECIES = wellKnownSymbol('species');
 
 module.exports = function (CONSTRUCTOR_NAME) {
   var Constructor = getBuiltIn(CONSTRUCTOR_NAME);
-  var defineProperty = definePropertyModule.f;
 
   if (DESCRIPTORS && Constructor && !Constructor[SPECIES]) {
-    defineProperty(Constructor, SPECIES, {
+    defineBuiltInAccessor(Constructor, SPECIES, {
       configurable: true,
       get: function () { return this; }
     });
@@ -9645,10 +9732,10 @@ var store = __webpack_require__(4489);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.26.1',
+  version: '3.30.1',
   mode: IS_PURE ? 'pure' : 'global',
-  copyright: '© 2014-2022 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.26.1/LICENSE',
+  copyright: '© 2014-2023 Denis Pushkarev (zloirock.ru)',
+  license: 'https://github.com/zloirock/core-js/blob/v3.30.1/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -9724,10 +9811,10 @@ var queue = {};
 var ONREADYSTATECHANGE = 'onreadystatechange';
 var $location, defer, channel, port;
 
-try {
+fails(function () {
   // Deno throws a ReferenceError on `location` access without `--location` flag
   $location = global.location;
-} catch (error) { /* empty */ }
+});
 
 var run = function (id) {
   if (hasOwn(queue, id)) {
@@ -9743,11 +9830,11 @@ var runner = function (id) {
   };
 };
 
-var listener = function (event) {
+var eventListener = function (event) {
   run(event.data);
 };
 
-var post = function (id) {
+var globalPostMessageDefer = function (id) {
   // old engines have not location.origin
   global.postMessage(String(id), $location.protocol + '//' + $location.host);
 };
@@ -9782,7 +9869,7 @@ if (!set || !clear) {
   } else if (MessageChannel && !IS_IOS) {
     channel = new MessageChannel();
     port = channel.port2;
-    channel.port1.onmessage = listener;
+    channel.port1.onmessage = eventListener;
     defer = bind(port.postMessage, port);
   // Browsers with postMessage, skip WebWorkers
   // IE8 has postMessage, but it's sync & typeof its postMessage is 'object'
@@ -9791,10 +9878,10 @@ if (!set || !clear) {
     isCallable(global.postMessage) &&
     !global.importScripts &&
     $location && $location.protocol !== 'file:' &&
-    !fails(post)
+    !fails(globalPostMessageDefer)
   ) {
-    defer = post;
-    global.addEventListener('message', listener, false);
+    defer = globalPostMessageDefer;
+    global.addEventListener('message', eventListener, false);
   // IE8-
   } else if (ONREADYSTATECHANGE in createElement('script')) {
     defer = function (id) {
@@ -10063,21 +10150,15 @@ var uid = __webpack_require__(5422);
 var NATIVE_SYMBOL = __webpack_require__(5558);
 var USE_SYMBOL_AS_UID = __webpack_require__(1876);
 
-var WellKnownSymbolsStore = shared('wks');
 var Symbol = global.Symbol;
-var symbolFor = Symbol && Symbol['for'];
-var createWellKnownSymbol = USE_SYMBOL_AS_UID ? Symbol : Symbol && Symbol.withoutSetter || uid;
+var WellKnownSymbolsStore = shared('wks');
+var createWellKnownSymbol = USE_SYMBOL_AS_UID ? Symbol['for'] || Symbol : Symbol && Symbol.withoutSetter || uid;
 
 module.exports = function (name) {
-  if (!hasOwn(WellKnownSymbolsStore, name) || !(NATIVE_SYMBOL || typeof WellKnownSymbolsStore[name] == 'string')) {
-    var description = 'Symbol.' + name;
-    if (NATIVE_SYMBOL && hasOwn(Symbol, name)) {
-      WellKnownSymbolsStore[name] = Symbol[name];
-    } else if (USE_SYMBOL_AS_UID && symbolFor) {
-      WellKnownSymbolsStore[name] = symbolFor(description);
-    } else {
-      WellKnownSymbolsStore[name] = createWellKnownSymbol(description);
-    }
+  if (!hasOwn(WellKnownSymbolsStore, name)) {
+    WellKnownSymbolsStore[name] = NATIVE_SYMBOL && hasOwn(Symbol, name)
+      ? Symbol[name]
+      : createWellKnownSymbol('Symbol.' + name);
   } return WellKnownSymbolsStore[name];
 };
 
@@ -40911,7 +40992,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@relative-ci/agent","version":"4.1.2","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","pretest":"npm install webpack4@npm:webpack@4.42.1","test":"jest test","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.19.3","@babel/core":"7.20.5","@babel/preset-env":"7.20.2","@types/jest":"29.2.3","eslint":"8.29.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.26.0","eslint-plugin-jest":"27.1.6","jest":"29.3.1","memory-fs":"0.5.0","webpack":"5.75.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.1.5","@bundle-stats/plugin-webpack-validate":"4.1.5","core-js":"3.26.1","cosmiconfig":"8.0.0","debug":"4.3.4","dotenv":"16.0.3","env-ci":"7.3.0","fs-extra":"11.1.0","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.6.2"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"}}');
+module.exports = JSON.parse('{"name":"@relative-ci/agent","version":"4.1.4","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","pretest":"npm install webpack4@npm:webpack@4.42.1","test":"jest test","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.21.0","@babel/core":"7.21.4","@babel/preset-env":"7.21.4","@types/jest":"29.5.1","eslint":"8.38.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.27.5","eslint-plugin-jest":"27.2.1","jest":"29.5.0","memory-fs":"0.5.0","webpack":"5.80.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.3.3","@bundle-stats/plugin-webpack-validate":"4.3.3","core-js":"3.30.1","cosmiconfig":"8.1.3","debug":"4.3.4","dotenv":"16.0.3","env-ci":"7.3.0","fs-extra":"11.1.1","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.7.1"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"}}');
 
 /***/ }),
 
