@@ -5,6 +5,11 @@ GitHub action that sends bundle stats and CI build information to [RelativeCI](h
 - [RelativeCI Setup guide](https://relative-ci.com/documentation/setup)
 - [RelativeCI GitHub action guide](https://relative-ci.com/documentation/setup/agent/github-action)
 
+## Other agents
+
+- [CLI and webpack-plugin](https://github.com/relative-ci/agent)
+- [CircleCI orbit (soon)](https://github.com/relative-ci/roadmap/issues/46)
+
 ---
 
 1. [Usage](#usage)
