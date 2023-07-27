@@ -9732,10 +9732,10 @@ var store = __webpack_require__(4489);
 (module.exports = function (key, value) {
   return store[key] || (store[key] = value !== undefined ? value : {});
 })('versions', []).push({
-  version: '3.31.0',
+  version: '3.31.1',
   mode: IS_PURE ? 'pure' : 'global',
   copyright: '© 2014-2023 Denis Pushkarev (zloirock.ru)',
-  license: 'https://github.com/zloirock/core-js/blob/v3.31.0/LICENSE',
+  license: 'https://github.com/zloirock/core-js/blob/v3.31.1/LICENSE',
   source: 'https://github.com/zloirock/core-js'
 });
 
@@ -41199,7 +41199,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = JSON.parse('{"name":"@relative-ci/agent","version":"4.1.5","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","pretest":"npm install webpack4@npm:webpack@4.42.1","test":"jest test","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.22.5","@babel/core":"7.22.5","@babel/preset-env":"7.22.5","@types/jest":"29.5.2","eslint":"8.43.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.27.5","eslint-plugin-jest":"27.2.2","jest":"29.5.0","memory-fs":"0.5.0","webpack":"5.87.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.4.2","@bundle-stats/plugin-webpack-validate":"4.4.2","core-js":"3.31.0","cosmiconfig":"8.2.0","debug":"4.3.4","dotenv":"16.3.1","env-ci":"7.3.0","fs-extra":"11.1.1","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.7.2"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"}}');
+module.exports = JSON.parse('{"name":"@relative-ci/agent","version":"4.1.6","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","bump":"./scripts/bump.sh","release":"./scripts/release.sh","pretest":"npm install webpack4@npm:webpack@4.42.1","test":"jest test","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.22.9","@babel/core":"7.22.9","@babel/preset-env":"7.22.9","@release-it/conventional-changelog":"7.0.0","@types/jest":"29.5.3","eslint":"8.45.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.27.5","eslint-plugin-jest":"27.2.3","jest":"29.6.1","memory-fs":"0.5.0","release-it":"16.1.3","webpack":"5.88.2"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.5.2","@bundle-stats/plugin-webpack-validate":"4.5.2","core-js":"3.31.1","cosmiconfig":"8.2.0","debug":"4.3.4","dotenv":"16.3.1","env-ci":"7.3.0","fs-extra":"11.1.1","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.7.2"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"}}');
 
 /***/ }),
 
