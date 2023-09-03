@@ -13,7 +13,7 @@ export function extractParams(context: GitHubContext): AgentParams {
 }
 
 /**
-  * Exctract params from the pull request event data
+  * Extract params from the pull request event data
   */
 export async function extractPullRequestParams(
   context: GitHubContext,
