@@ -40,7 +40,7 @@
     "lodash": "^4.17.21"
   },
   "devDependencies": {
-    "@babel/core": "7.22.11",
+    "@babel/core": "7.22.17",
     "@babel/eslint-parser": "^7.22.11",
     "@babel/preset-env": "7.22.15",
     "@types/adm-zip": "^0.5.0",
