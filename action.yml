@@ -1,5 +1,5 @@
 name: 'RelativeCI agent'
-description: 'Send webpack stats and CI build information to RelativeCI'
+description: 'Send bundle stats and CI build information to RelativeCI'
 branding:
   icon: 'box'
   color: 'blue'
@@ -8,7 +8,7 @@ inputs:
     description: GitHub token
     required: true
   key:
-    description: 'RelativeCI project key'
+    description: 'RelativeCI project API key'
     required: true
   webpackStatsFile:
     description: 'Path to your local bundle stats file'
@@ -28,7 +28,7 @@ inputs:
     required: false,
     default: 'false'
   artifactName:
-    description: 'Artifact to download when running in workflow_run'
+    description: 'GitHub action artifact name to download when running in workflow_run'
     required: false
   artifactWebpackStatsFile:
     description: 'Artifact bundle stats file path'
