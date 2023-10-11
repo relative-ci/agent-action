@@ -28,6 +28,7 @@
   },
   "homepage": "https://relative-ci.com/documentation/setup",
   "scripts": {
+    "add-files": "npm install && npm run build && rm -fr node_modules && npm install --omit=dev && git add -f node_modules dist",
     "lint": "eslint .",
     "build": "webpack --mode production"
   },
