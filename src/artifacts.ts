@@ -75,7 +75,7 @@ export async function getWebpackStatsFromArtifact(
   if (!webpackStats) {
     throw new Error(
       `Unable to unzip '${artifactWebpackStatsFile}' from '${artifactName}' archive.
-       Please make sure the value of 'artifactWebpackStatsFile' is correct.
+       Please make sure the value of 'webpackStatsFile' is correct.
     `);
   }
 
