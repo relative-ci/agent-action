@@ -161,12 +161,6 @@ Default: `relative-ci-artifacts` when running during `workflow_run` event
 
 The name of the artifact that containts the bundle stats uploaded by the triggering workflow
 
-#### `artifactWebpackStatsFile` 
-
-Default: `webpack-stats.json` when running during `workflow_run` event
-
-The artifact bundle stats file path
-
 ## Secrets
 
 ### `RELATIVE_CI_KEY`

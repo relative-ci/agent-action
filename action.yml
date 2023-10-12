@@ -30,9 +30,6 @@ inputs:
   artifactName:
     description: 'GitHub action artifact name to download when running in workflow_run'
     required: false
-  artifactWebpackStatsFile:
-    description: 'Artifact bundle stats file path'
-    required: false
 runs:
   using: 'node20'
   main: 'dist/index.js'
