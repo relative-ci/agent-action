@@ -63024,7 +63024,7 @@ function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifactWebp
           logger.debug("Read artifact '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive"));
           webpackStats = zip.readAsText(artifactWebpackStatsFile, 'utf-8');
           if (!webpackStats) {
-            throw new Error("Unable to unzip '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive.\n       Please make sure the value of 'artifactWebpackStatsFile' is correct.\n    "));
+            throw new Error("Unable to unzip '".concat(artifactWebpackStatsFile, "' from '").concat(artifactName, "' archive.\n       Please make sure the value of 'webpackStatsFile' is correct.\n    "));
           }
           return [2 /*return*/, JSON.parse(webpackStats)];
       }
