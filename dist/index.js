@@ -7178,7 +7178,7 @@ var _send = _interopRequireDefault(__webpack_require__(9480));
 var _utils = __webpack_require__(2917);
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * @typedef {import('../').AgentConfig} AgentConfig
  * @typedef {import('../').AgentArgs} AgentArgs
@@ -7273,7 +7273,7 @@ var _lodash = __webpack_require__(7243);
 var _isomorphicFetch = _interopRequireDefault(__webpack_require__(2358));
 var _en = _interopRequireDefault(__webpack_require__(8497));
 var _utils = __webpack_require__(2917);
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 var _default = async (data, params, config, logger) => {
   const {
     key,
@@ -7377,7 +7377,7 @@ var _debug = _interopRequireDefault(__webpack_require__(9221));
 var _get = _interopRequireDefault(__webpack_require__(2832));
 var _set = _interopRequireDefault(__webpack_require__(7748));
 var _merge = _interopRequireDefault(__webpack_require__(5632));
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+function _interopRequireDefault(e) { return e && e.__esModule ? e : { default: e }; }
 /**
  * @typedef {import('../').EnvVars} EnvVars
  */
@@ -66306,7 +66306,7 @@ module.exports = require("zlib");
 /***/ ((module) => {
 
 "use strict";
-module.exports = /*#__PURE__*/JSON.parse('{"name":"@relative-ci/agent","version":"4.2.6","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","bump":"./scripts/bump.sh","release":"./scripts/release.sh","pretest:webpack-plugin":"npm install webpack4@npm:webpack@4.42.1","test":"npm run test:cli && npm run test:webpack-plugin","test:cli":"jest test/cli.test.js","test:webpack-plugin":"jest test/webpack-plugin","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.24.1","@babel/core":"7.24.3","@babel/preset-env":"7.24.3","@release-it/conventional-changelog":"8.0.1","@types/jest":"29.5.12","eslint":"8.57.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.29.1","eslint-plugin-jest":"27.9.0","jest":"29.7.0","memory-fs":"0.5.0","release-it":"17.0.0","webpack4":"npm:webpack@^4.42.1","webpack":"5.91.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.12.2","@bundle-stats/plugin-webpack-validate":"4.12.2","core-js":"3.36.1","cosmiconfig":"9.0.0","debug":"4.3.4","dotenv":"16.4.5","env-ci":"7.3.0","fs-extra":"11.2.0","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.7.2"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"},"peerDependenciesMeta":{"webpack":{"optional":true}}}');
+module.exports = /*#__PURE__*/JSON.parse('{"name":"@relative-ci/agent","version":"4.2.8","description":"Relative CI agent","repository":"relative-ci/agent","main":"lib/index.js","types":"typings.d.ts","bin":{"relative-ci-agent":"bin/index.js"},"scripts":{"build":"babel src -d lib","lint":"eslint .","bump":"./scripts/bump.sh","release":"./scripts/release.sh","pretest:webpack-plugin":"npm install webpack4@npm:webpack@4.42.1","test":"npm run test:cli && npm run test:webpack-plugin","test:cli":"jest test/cli.test.js","test:webpack-plugin":"jest test/webpack-plugin","prepublishOnly":"npm run build"},"engines":{"node":">= 14.0"},"keywords":["webpack","bundle-size","bundle-analyzer","bundle-stats","stats","bundle","size","assets","chunks","modules"],"author":{"name":"Viorel Cojocaru","email":"vio@beanon.com","url":"http://beanon.com"},"license":"MIT","bugs":{"url":"https://github.com/relative-ci/agent/issues"},"homepage":"https://relative-ci.com/documentation/setup","devDependencies":{"@babel/cli":"7.24.6","@babel/core":"7.24.6","@babel/preset-env":"7.24.6","@release-it/conventional-changelog":"8.0.1","@types/jest":"29.5.12","eslint":"8.57.0","eslint-config-airbnb-base":"15.0.0","eslint-plugin-import":"2.29.1","eslint-plugin-jest":"28.5.0","jest":"29.7.0","memory-fs":"0.5.0","release-it":"17.0.0","webpack4":"npm:webpack@^4.42.1","webpack":"5.91.0"},"dependencies":{"@bundle-stats/plugin-webpack-filter":"4.13.2","@bundle-stats/plugin-webpack-validate":"4.13.2","core-js":"3.37.1","cosmiconfig":"9.0.0","debug":"4.3.4","dotenv":"16.4.5","env-ci":"7.3.0","fs-extra":"11.2.0","isomorphic-fetch":"3.0.0","lodash":"4.17.21","yargs":"17.7.2"},"peerDependencies":{"webpack":"^4.0.0 || ^5.0.0-rc.1"},"peerDependenciesMeta":{"webpack":{"optional":true}}}');
 
 /***/ }),
 
