@@ -38,16 +38,16 @@ on:
 jobs:
   build:
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: 'latest'
 
       # Install dependencies
       - run: npm ci
 
       # Build and output bundle stats
-      # see https://relative-ci.com/documentation/setup/agent/github-action/#step-1-output-bundle-stats-json-file
+      # Learn more: https://relative-ci.com/documentation/setup/agent/github-action#step-1-output-bundle-stats-json-file
       - run: npm run build -- --json webpack-stats
       
       - name: Send bundle stats to RelativeCI
@@ -78,20 +78,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: 'latest'
 
       # Install dependencies
       - run: npm ci
 
       # Build and output bundle stats to webpack-stats.json
+      # Learn more: https://relative-ci.com/documentation/setup/agent/github-action#step-1-output-bundle-stats-json-file
       - run: npm run build --json webpack-stats.json
 
       # Upload webpack-stats.json to use on relative-ci.yaml workflow
       - name: Upload bundle stats artifact
-        uses: relative-ci/agent-upload-artifact-action@v1
+        uses: relative-ci/agent-upload-artifact-action@v2
         with:
           webpackStatsFile: ./webpack-stats.json
 ```
