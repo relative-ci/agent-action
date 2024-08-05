@@ -28,7 +28,7 @@ const ConcatenatedModule = require("./ConcatenatedModule");
 /** @typedef {import("../util/runtime").RuntimeSpec} RuntimeSpec */
 
 /**
- * @typedef {Object} Statistics
+ * @typedef {object} Statistics
  * @property {number} cached
  * @property {number} alreadyInConfig
  * @property {number} invalidModule
@@ -398,10 +398,12 @@ class ModuleConcatenationPlugin {
 							}
 
 							// Create a new ConcatenatedModule
+							ConcatenatedModule.getCompilationHooks(compilation);
 							let newModule = ConcatenatedModule.create(
 								rootModule,
 								modules,
 								concatConfiguration.runtime,
+								compilation,
 								compiler.root,
 								compilation.outputOptions.hashFunction
 							);
