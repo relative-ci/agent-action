@@ -48,7 +48,7 @@ jobs:
 
       # Build and output bundle stats
       # Learn more: https://relative-ci.com/documentation/setup/agent/github-action#step-1-output-bundle-stats-json-file
-      - run: npm run build -- --json webpack-stats
+      - run: npm run build -- --json webpack-stats.json
       
       - name: Send bundle stats to RelativeCI
         uses: relative-ci/agent-action@v2
@@ -88,7 +88,7 @@ jobs:
 
       # Build and output bundle stats to webpack-stats.json
       # Learn more: https://relative-ci.com/documentation/setup/agent/github-action#step-1-output-bundle-stats-json-file
-      - run: npm run build --json webpack-stats.json
+      - run: npm run build -- --json webpack-stats.json
 
       # Upload webpack-stats.json to use on relative-ci.yaml workflow
       - name: Upload bundle stats artifact
