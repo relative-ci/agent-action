@@ -31,5 +31,5 @@ inputs:
     description: 'GitHub action artifact name to download when running in workflow_run'
     required: false
 runs:
-  using: 'node20'
+  using: 'node22'
   main: 'dist/index.js'
