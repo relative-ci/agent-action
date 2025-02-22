@@ -3,10 +3,9 @@
     "outDir": "./dist/",
     "sourceMap": true,
     "noImplicitAny": true,
+    "allowJs": true,
     "module": "esnext",
     "moduleResolution": "bundler",
-    "target": "esnext",
-    "allowJs": true,
-    "moduleResolution": "node"
+    "target": "esnext"
   }
 }
