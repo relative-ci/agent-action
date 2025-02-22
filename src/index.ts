@@ -1,29 +1,33 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import { agent } from '@relative-ci/agent/lib/agent';
+import ingest from '@relative-ci/agent/ingest';
+import { filterArtifacts } from '@relative-ci/agent/artifacts';
+import { logResponse, normalizeParams } from '@relative-ci/agent/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
 import { logger } from './utils';
+import { AgentParams } from './types';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
 async function run() {
   try {
     const token = core.getInput('token');
+
     const key = core.getInput('key');
     const slug = core.getInput('slug');
     const endpoint = core.getInput('endpoint');
+    const includeCommitMessage = core.getInput('includeCommitMessage') === 'true';
+
     const webpackStatsFile = core.getInput('webpackStatsFile');
     const artifactName = core.getInput('artifactName');
-    const includeCommitMessage = core.getInput('includeCommitMessage') === 'true';
     const debug = core.getInput('debug') === 'true';
 
     const { eventName } = github.context;
 
-    // Extract data
-    // @type {AgentParams}
-    let agentParams;
+    // Extract env data
+    let agentParams: AgentParams;
 
     if (eventName === 'pull_request') {
       logger.debug('Extract params for pull_request flow');
@@ -36,7 +40,7 @@ async function run() {
       agentParams = extractParams(github.context);
     }
 
-    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`)
+    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`);
 
     // Get webpack stats json
     let webpackStats = {};
@@ -54,31 +58,23 @@ async function run() {
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
 
-    // Set RelativeCI service key
-    // @TODO pass it as an argument to agent
-    process.env.RELATIVE_CI_KEY = key;
-    process.env.RELATIVE_CI_ENDPOINT = endpoint;
-
     // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
     if (debug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }
 
-    await agent(
-      [
-        {
-          key: 'webpack.stats',
-          data: webpackStats,
-        },
-      ],
-      { includeCommitMessage },
-      {
-        slug,
-        ...agentParams,
-      },
-    );
-  } catch (err) {
-    core.setFailed(err);
+    process.env.RELATIVE_CI_KEY = key;
+    process.env.RELATIVE_CI_SLUG = slug;
+    process.env.RELATIVE_CI_ENDPOINT = endpoint;
+
+    const params = normalizeParams(agentParams, { includeCommitMessage });
+    const data = filterArtifacts([{ key: 'webpack.stats', data: webpackStats }]);
+
+    const response = await ingest(data, params, undefined, logger);
+
+    logResponse(response, logger);
+  } catch (error) {
+    core.setFailed(error);
   }
 }
 
