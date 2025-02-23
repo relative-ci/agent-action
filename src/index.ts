@@ -26,6 +26,11 @@ async function run() {
 
     const { eventName } = github.context;
 
+    // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
+    if (debug || ACTIONS_STEP_DEBUG) {
+      process.env.DEBUG = 'relative-ci:agent';
+    }
+
     // Extract env data
     let agentParams: AgentParams;
 
@@ -42,7 +47,9 @@ async function run() {
 
     logger.debug(`Agent params: ${JSON.stringify(agentParams)}`);
 
-    // Get webpack stats json
+    /**
+     * Read JSON from the current job or download it from another job's artifact
+     */
     let webpackStats = {};
 
     // Get webpack stats file from an artifact
@@ -58,20 +65,19 @@ async function run() {
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
 
-    // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
-    if (debug || ACTIONS_STEP_DEBUG) {
-      process.env.DEBUG = 'relative-ci:agent';
-    }
-
     validateWebpackStats(webpackStats);
 
+    // Extract params
     process.env.RELATIVE_CI_KEY = key;
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
 
     const params = normalizeParams(agentParams, { includeCommitMessage });
+
+    // Filter artifacts
     const data = filterArtifacts([{ key: 'webpack.stats', data: webpackStats }]);
 
+    // Send data to RelativeCI
     const response = await ingest(data, params, undefined, logger);
 
     logResponse(response, logger);
