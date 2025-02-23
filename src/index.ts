@@ -1,7 +1,7 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
 import ingest from '@relative-ci/agent/ingest';
-import { filterArtifacts } from '@relative-ci/agent/artifacts';
+import { filterArtifacts, validateWebpackStats } from '@relative-ci/agent/artifacts';
 import { logResponse, normalizeParams } from '@relative-ci/agent/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
@@ -62,6 +62,8 @@ async function run() {
     if (debug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }
+
+    validateWebpackStats(webpackStats);
 
     process.env.RELATIVE_CI_KEY = key;
     process.env.RELATIVE_CI_SLUG = slug;
