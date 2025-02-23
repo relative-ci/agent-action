@@ -5,6 +5,6 @@ export type GitHubContext = Context;
 export interface AgentParams {
   commit?: string;
   branch?: string;
-  pr?: number;
+  pr?: string;
   commitMessage?: string;
 }

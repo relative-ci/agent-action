@@ -1,7 +1,13 @@
 import * as core from '@actions/core';
 import { GitHub } from '@actions/github/lib/utils';
 
-export const logger: Omit<typeof core, 'info | debug | warning | error'> = core;
+export const logger = {
+  log: core.info,
+  debug: core.debug,
+  info: core.info,
+  warn: core.warning,
+  error: core.error,
+};
 
 interface GetGitHubCommitMessageParams {
   octokit: InstanceType<typeof GitHub>,
@@ -28,7 +34,7 @@ export async function getGitHubCommitMessage(
     commitMessage = res?.data?.commit?.message;
   } catch (err) {
     logger.debug(`Error fetching commit message: ${err.message}`);
-    logger.warning(err);
+    logger.warn(err);
   }
 
   return commitMessage;
