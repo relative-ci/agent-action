@@ -6,8 +6,9 @@ import { logResponse, normalizeParams } from '@relative-ci/agent/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
-import { logger } from './utils';
+import { getSummary, logger } from './utils';
 import { AgentParams } from './types';
+import { text } from 'stream/consumers';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
@@ -79,6 +80,14 @@ async function run() {
 
     // Send data to RelativeCI
     const response = await ingest(data, params, undefined, logger);
+
+    // Output summary
+    const summary = getSummary({
+      title: response.info.message.txt,
+      url: response.reportUrl,
+    });
+
+    await core.summary.addRaw(summary).write();
 
     logResponse(response, logger);
   } catch (error) {
