@@ -1,4 +1,5 @@
 const path = require('path');
+const nodeExternals = require('webpack-node-externals');
 
 const CONTEXT = path.join(__dirname, 'src');
 
@@ -10,7 +11,8 @@ module.exports = {
   output: {
     path: path.join(__dirname, 'dist'),
   },
-  target: 'node',
+  externalsPresets: { node: true },
+  externals: [nodeExternals()],
   resolve: {
     extensions: ['.ts', '.js', '.json'],
     mainFields: ['main'],

@@ -47,7 +47,7 @@ export async function extractPullRequestParams(
 
   const commit = pullRequest?.head?.sha;
   const branch = pullRequest?.head?.ref;
-  const pr = pullRequest?.number;
+  const pr = pullRequest?.number?.toString();
 
   return {
     commit, branch, pr, commitMessage,
