@@ -41,7 +41,7 @@
     "lodash": "4.17.21"
   },
   "devDependencies": {
-    "@babel/core": "7.26.9",
+    "@babel/core": "7.26.10",
     "@babel/eslint-parser": "7.26.10",
     "@babel/preset-env": "7.26.9",
     "@tsconfig/node20": "^20.1.5",
