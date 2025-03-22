@@ -1,14 +1,13 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import ingest from '@relative-ci/agent/ingest';
-import { filterArtifacts, validateWebpackStats } from '@relative-ci/agent/artifacts';
-import { logResponse, normalizeParams } from '@relative-ci/agent/utils';
+import ingest from '@relative-ci/core/ingest';
+import { filterArtifacts, validateWebpackStats } from '@relative-ci/core/artifacts';
+import { logResponse, normalizeParams } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
 import { getSummary, logger } from './utils';
 import { AgentParams } from './types';
-import { text } from 'stream/consumers';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
