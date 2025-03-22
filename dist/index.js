@@ -39,13 +39,13 @@
 const core_namespaceObject = require("@actions/core");
 ;// external "@actions/github"
 const github_namespaceObject = require("@actions/github");
-;// external "@relative-ci/agent/ingest"
-const ingest_namespaceObject = require("@relative-ci/agent/ingest");
+;// external "@relative-ci/core/ingest"
+const ingest_namespaceObject = require("@relative-ci/core/ingest");
 var ingest_default = /*#__PURE__*/__webpack_require__.n(ingest_namespaceObject);
-;// external "@relative-ci/agent/artifacts"
-const artifacts_namespaceObject = require("@relative-ci/agent/artifacts");
-;// external "@relative-ci/agent/utils"
-const utils_namespaceObject = require("@relative-ci/agent/utils");
+;// external "@relative-ci/core/artifacts"
+const artifacts_namespaceObject = require("@relative-ci/core/artifacts");
+;// external "@relative-ci/core/utils"
+const utils_namespaceObject = require("@relative-ci/core/utils");
 ;// external "util"
 const external_util_namespaceObject = require("util");
 ;// external "path"
