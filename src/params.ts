@@ -4,15 +4,6 @@ import { getGitHubCommitMessage, logger } from './utils';
 import { AgentParams, GitHubContext } from './types';
 
 /**
-  * Extract params from the current ref, env-ci will handle the rest at the agent level
-  */
-export function extractParams(context: GitHubContext): AgentParams {
-  return {
-    commitMessage: context.payload?.head_commit?.message,
-  };
-}
-
-/**
   * Extract params from the pull request event data
   */
 export async function extractPullRequestParams(
@@ -45,39 +36,7 @@ export async function extractPullRequestParams(
     }
   }
 
-  const commit = pullRequest?.head?.sha;
-  const branch = pullRequest?.head?.ref;
-  const pr = pullRequest?.number?.toString();
-
   return {
-    commit, branch, pr, commitMessage,
-  };
-}
-
-/**
-  * Extract params from workflow_run event data
-  */
-export async function extractWorkflowRunParams(
-  context: GitHubContext
-): Promise<AgentParams> {
-  const { payload } = context;
-  const { workflow_run: workflowRun } = payload;
-
-  const commit = workflowRun?.head_commit?.id;
-  const commitMessage = workflowRun?.head_commit?.message;
-  const pr = (workflowRun.event === 'pull_request') ? workflowRun?.pull_requests?.[0]?.number : undefined;
-  let branch = workflowRun.head_branch;
-
-  // prefix branch with owner when the event is triggered by a fork
-  const headOwner = workflowRun?.head_repository?.owner?.login;
-  if (headOwner && headOwner !== payload?.repository?.owner?.login) {
-    branch = `${headOwner}:${branch}`;
-  }
-
-  return {
-    commit,
     commitMessage,
-    branch,
-    pr,
   };
 }

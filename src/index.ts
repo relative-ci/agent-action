@@ -6,7 +6,7 @@ import loadEnv from '@relative-ci/core/env';
 import { logResponse } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
-import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
+import { extractPullRequestParams } from './params';
 import { getSummary, logger } from './utils';
 import { AgentParams } from './types';
 
@@ -32,21 +32,24 @@ async function run() {
       process.env.DEBUG = 'relative-ci:agent';
     }
 
-    // Extract env data
-    let agentParams: AgentParams;
+    // Extract params
+    process.env.RELATIVE_CI_KEY = key;
+    process.env.RELATIVE_CI_SLUG = slug;
+    process.env.RELATIVE_CI_ENDPOINT = endpoint;
 
-    if (eventName === 'pull_request') {
+    const env = loadEnv({}, { includeCommitMessage });
+
+    // Extract env data
+    let actionEnv: AgentParams;
+
+    if (!env.commitMessage && includeCommitMessage && eventName === 'pull_request') {
       logger.debug('Extract params for pull_request flow');
-      agentParams = await extractPullRequestParams(github.context, token, includeCommitMessage);
-    } else if (eventName === 'workflow_run') {
-      logger.debug('Extract params for workflow_run flow');
-      agentParams = await extractWorkflowRunParams(github.context);
-    } else {
-      logger.debug('Extract params for default flow');
-      agentParams = extractParams(github.context);
+      actionEnv = await extractPullRequestParams(github.context, token, includeCommitMessage);
     }
 
-    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`);
+    logger.debug(`Agent params: ${JSON.stringify(actionEnv)}`);
+
+    const params = { ...env, ...actionEnv };
 
     /**
      * Read JSON from the current job or download it from another job's artifact
@@ -67,13 +70,6 @@ async function run() {
     }
 
     validateWebpackStats(webpackStats);
-
-    // Extract params
-    process.env.RELATIVE_CI_KEY = key;
-    process.env.RELATIVE_CI_SLUG = slug;
-    process.env.RELATIVE_CI_ENDPOINT = endpoint;
-
-    const params = loadEnv(agentParams, { includeCommitMessage });
 
     // Filter artifacts
     const data = filterArtifacts([{ key: 'webpack.stats', data: webpackStats }]);
