@@ -2,7 +2,8 @@ import * as core from '@actions/core';
 import * as github from '@actions/github';
 import ingest from '@relative-ci/core/ingest';
 import { filterArtifacts, validateWebpackStats } from '@relative-ci/core/artifacts';
-import { logResponse, normalizeParams } from '@relative-ci/core/utils';
+import loadEnv from '@relative-ci/core/env';
+import { logResponse } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
@@ -72,7 +73,7 @@ async function run() {
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
 
-    const params = normalizeParams(agentParams, { includeCommitMessage });
+    const params = loadEnv(agentParams, { includeCommitMessage });
 
     // Filter artifacts
     const data = filterArtifacts([{ key: 'webpack.stats', data: webpackStats }]);
