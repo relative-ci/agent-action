@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "outDir": "./dist",
+    "lib": ["es2024"],
     "sourceMap": true,
     "noImplicitAny": true,
     "allowJs": true,
