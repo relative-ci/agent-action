@@ -158,14 +158,6 @@ async function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifa
 
 
 /**
-  * Extract params from the current ref, env-ci will handle the rest at the agent level
-  */
-function extractParams(context) {
-  return {
-    commitMessage: context.payload?.head_commit?.message
-  };
-}
-/**
   * Extract params from the pull request event data
   */
 async function extractPullRequestParams(context, token, includeCommitMessage) {
@@ -195,40 +187,8 @@ async function extractPullRequestParams(context, token, includeCommitMessage) {
       }
     }
   }
-  const commit = pullRequest?.head?.sha;
-  const branch = pullRequest?.head?.ref;
-  const pr = pullRequest?.number?.toString();
   return {
-    commit,
-    branch,
-    pr,
     commitMessage
-  };
-}
-/**
-  * Extract params from workflow_run event data
-  */
-async function extractWorkflowRunParams(context) {
-  const {
-    payload
-  } = context;
-  const {
-    workflow_run: workflowRun
-  } = payload;
-  const commit = workflowRun?.head_commit?.id;
-  const commitMessage = workflowRun?.head_commit?.message;
-  const pr = workflowRun.event === 'pull_request' ? workflowRun?.pull_requests?.[0]?.number : undefined;
-  let branch = workflowRun.head_branch;
-  // prefix branch with owner when the event is triggered by a fork
-  const headOwner = workflowRun?.head_repository?.owner?.login;
-  if (headOwner && headOwner !== payload?.repository?.owner?.login) {
-    branch = `${headOwner}:${branch}`;
-  }
-  return {
-    commit,
-    commitMessage,
-    branch,
-    pr
   };
 }
 ;// ./index.ts
@@ -262,19 +222,24 @@ async function run() {
     if (debug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }
+    // Extract params
+    process.env.RELATIVE_CI_KEY = key;
+    process.env.RELATIVE_CI_SLUG = slug;
+    process.env.RELATIVE_CI_ENDPOINT = endpoint;
+    const env = env_default()({}, {
+      includeCommitMessage
+    });
     // Extract env data
-    let agentParams;
-    if (eventName === 'pull_request') {
+    let actionEnv;
+    if (!env.commitMessage && includeCommitMessage && eventName === 'pull_request') {
       logger.debug('Extract params for pull_request flow');
-      agentParams = await extractPullRequestParams(github_namespaceObject.context, token, includeCommitMessage);
-    } else if (eventName === 'workflow_run') {
-      logger.debug('Extract params for workflow_run flow');
-      agentParams = await extractWorkflowRunParams(github_namespaceObject.context);
-    } else {
-      logger.debug('Extract params for default flow');
-      agentParams = extractParams(github_namespaceObject.context);
+      actionEnv = await extractPullRequestParams(github_namespaceObject.context, token, includeCommitMessage);
     }
-    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`);
+    logger.debug(`Agent params: ${JSON.stringify(actionEnv)}`);
+    const params = {
+      ...env,
+      ...actionEnv
+    };
     /**
      * Read JSON from the current job or download it from another job's artifact
      */
@@ -290,13 +255,6 @@ async function run() {
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
     (0,artifacts_namespaceObject.validateWebpackStats)(webpackStats);
-    // Extract params
-    process.env.RELATIVE_CI_KEY = key;
-    process.env.RELATIVE_CI_SLUG = slug;
-    process.env.RELATIVE_CI_ENDPOINT = endpoint;
-    const params = env_default()(agentParams, {
-      includeCommitMessage
-    });
     // Filter artifacts
     const data = (0,artifacts_namespaceObject.filterArtifacts)([{
       key: 'webpack.stats',
