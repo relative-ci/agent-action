@@ -44,6 +44,9 @@ const ingest_namespaceObject = require("@relative-ci/core/ingest");
 var ingest_default = /*#__PURE__*/__webpack_require__.n(ingest_namespaceObject);
 ;// external "@relative-ci/core/artifacts"
 const artifacts_namespaceObject = require("@relative-ci/core/artifacts");
+;// external "@relative-ci/core/env"
+const env_namespaceObject = require("@relative-ci/core/env");
+var env_default = /*#__PURE__*/__webpack_require__.n(env_namespaceObject);
 ;// external "@relative-ci/core/utils"
 const utils_namespaceObject = require("@relative-ci/core/utils");
 ;// external "util"
@@ -237,6 +240,7 @@ async function extractWorkflowRunParams(context) {
 
 
 
+
 const {
   ACTIONS_STEP_DEBUG,
   GITHUB_WORKSPACE
@@ -290,7 +294,7 @@ async function run() {
     process.env.RELATIVE_CI_KEY = key;
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
-    const params = (0,utils_namespaceObject.normalizeParams)(agentParams, {
+    const params = env_default()(agentParams, {
       includeCommitMessage
     });
     // Filter artifacts
