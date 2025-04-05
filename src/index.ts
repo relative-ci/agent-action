@@ -6,7 +6,6 @@ import loadEnv from '@relative-ci/core/env';
 import { logResponse } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
-import { extractPullRequestParams } from './params';
 import { getSummary, logger } from './utils';
 import { AgentParams } from './types';
 
@@ -37,19 +36,9 @@ async function run() {
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
 
-    const env = loadEnv({}, { includeCommitMessage });
+    const params = loadEnv({ agentType: 'github-action' }, { includeCommitMessage });
 
-    // Extract env data
-    let actionEnv: AgentParams;
-
-    if (!env.commitMessage && includeCommitMessage && eventName === 'pull_request') {
-      logger.debug('Extract params for pull_request flow');
-      actionEnv = await extractPullRequestParams(github.context, token, includeCommitMessage);
-    }
-
-    logger.debug(`Agent params: ${JSON.stringify(actionEnv)}`);
-
-    const params = { ...env, ...actionEnv };
+    logger.debug(`Agent params: ${JSON.stringify(params)}`);
 
     /**
      * Read JSON from the current job or download it from another job's artifact
