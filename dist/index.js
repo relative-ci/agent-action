@@ -154,45 +154,7 @@ async function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifa
   }
   return JSON.parse(webpackStats);
 }
-;// ./params.ts
-
-
-/**
-  * Extract params from the pull request event data
-  */
-async function extractPullRequestParams(context, token, includeCommitMessage) {
-  const {
-    payload,
-    repo
-  } = context;
-  const {
-    pull_request: pullRequest
-  } = payload;
-  let commitMessage;
-  if (includeCommitMessage) {
-    logger.debug(`Fetching commit message for '${repo.owner}/${repo.repo}#${pullRequest?.head?.sha}'`);
-    if (!token) {
-      logger.error('"token" input is required when "includeCommitMessage" is true');
-    } else {
-      const octokit = github_namespaceObject.getOctokit(token);
-      try {
-        commitMessage = await getGitHubCommitMessage({
-          octokit,
-          owner: repo.owner,
-          repo: repo.repo,
-          ref: pullRequest?.head?.sha
-        });
-      } catch (err) {
-        logger.error(`Error fetching commit data: ${err.message}`);
-      }
-    }
-  }
-  return {
-    commitMessage
-  };
-}
 ;// ./index.ts
-
 
 
 
@@ -226,20 +188,12 @@ async function run() {
     process.env.RELATIVE_CI_KEY = key;
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
-    const env = env_default()({}, {
+    const params = env_default()({
+      agentType: 'github-action'
+    }, {
       includeCommitMessage
     });
-    // Extract env data
-    let actionEnv;
-    if (!env.commitMessage && includeCommitMessage && eventName === 'pull_request') {
-      logger.debug('Extract params for pull_request flow');
-      actionEnv = await extractPullRequestParams(github_namespaceObject.context, token, includeCommitMessage);
-    }
-    logger.debug(`Agent params: ${JSON.stringify(actionEnv)}`);
-    const params = {
-      ...env,
-      ...actionEnv
-    };
+    logger.debug(`Agent params: ${JSON.stringify(params)}`);
     /**
      * Read JSON from the current job or download it from another job's artifact
      */
