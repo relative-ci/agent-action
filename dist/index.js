@@ -66,28 +66,6 @@ const logger = {
   warn: core_namespaceObject.warning,
   error: core_namespaceObject.error
 };
-async function getGitHubCommitMessage(params) {
-  const {
-    octokit,
-    owner,
-    repo,
-    ref
-  } = params;
-  logger.debug(`Fetching commit message`);
-  let commitMessage;
-  try {
-    const res = await octokit.rest.repos.getCommit({
-      owner,
-      repo,
-      ref
-    });
-    commitMessage = res?.data?.commit?.message;
-  } catch (err) {
-    logger.debug(`Error fetching commit message: ${err.message}`);
-    logger.warn(err);
-  }
-  return commitMessage;
-}
 function getSummary({
   title,
   url
