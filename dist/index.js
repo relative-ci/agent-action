@@ -39,13 +39,16 @@
 const core_namespaceObject = require("@actions/core");
 ;// external "@actions/github"
 const github_namespaceObject = require("@actions/github");
-;// external "@relative-ci/agent/ingest"
-const ingest_namespaceObject = require("@relative-ci/agent/ingest");
+;// external "@relative-ci/core/ingest"
+const ingest_namespaceObject = require("@relative-ci/core/ingest");
 var ingest_default = /*#__PURE__*/__webpack_require__.n(ingest_namespaceObject);
-;// external "@relative-ci/agent/artifacts"
-const artifacts_namespaceObject = require("@relative-ci/agent/artifacts");
-;// external "@relative-ci/agent/utils"
-const utils_namespaceObject = require("@relative-ci/agent/utils");
+;// external "@relative-ci/core/artifacts"
+const artifacts_namespaceObject = require("@relative-ci/core/artifacts");
+;// external "@relative-ci/core/env"
+const env_namespaceObject = require("@relative-ci/core/env");
+var env_default = /*#__PURE__*/__webpack_require__.n(env_namespaceObject);
+;// external "@relative-ci/core/utils"
+const utils_namespaceObject = require("@relative-ci/core/utils");
 ;// external "util"
 const external_util_namespaceObject = require("util");
 ;// external "path"
@@ -63,28 +66,6 @@ const logger = {
   warn: core_namespaceObject.warning,
   error: core_namespaceObject.error
 };
-async function getGitHubCommitMessage(params) {
-  const {
-    octokit,
-    owner,
-    repo,
-    ref
-  } = params;
-  logger.debug(`Fetching commit message`);
-  let commitMessage;
-  try {
-    const res = await octokit.rest.repos.getCommit({
-      owner,
-      repo,
-      ref
-    });
-    commitMessage = res?.data?.commit?.message;
-  } catch (err) {
-    logger.debug(`Error fetching commit message: ${err.message}`);
-    logger.warn(err);
-  }
-  return commitMessage;
-}
 function getSummary({
   title,
   url
@@ -151,83 +132,6 @@ async function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifa
   }
   return JSON.parse(webpackStats);
 }
-;// ./params.ts
-
-
-/**
-  * Extract params from the current ref, env-ci will handle the rest at the agent level
-  */
-function extractParams(context) {
-  return {
-    commitMessage: context.payload?.head_commit?.message
-  };
-}
-/**
-  * Extract params from the pull request event data
-  */
-async function extractPullRequestParams(context, token, includeCommitMessage) {
-  const {
-    payload,
-    repo
-  } = context;
-  const {
-    pull_request: pullRequest
-  } = payload;
-  let commitMessage;
-  if (includeCommitMessage) {
-    logger.debug(`Fetching commit message for '${repo.owner}/${repo.repo}#${pullRequest?.head?.sha}'`);
-    if (!token) {
-      logger.error('"token" input is required when "includeCommitMessage" is true');
-    } else {
-      const octokit = github_namespaceObject.getOctokit(token);
-      try {
-        commitMessage = await getGitHubCommitMessage({
-          octokit,
-          owner: repo.owner,
-          repo: repo.repo,
-          ref: pullRequest?.head?.sha
-        });
-      } catch (err) {
-        logger.error(`Error fetching commit data: ${err.message}`);
-      }
-    }
-  }
-  const commit = pullRequest?.head?.sha;
-  const branch = pullRequest?.head?.ref;
-  const pr = pullRequest?.number?.toString();
-  return {
-    commit,
-    branch,
-    pr,
-    commitMessage
-  };
-}
-/**
-  * Extract params from workflow_run event data
-  */
-async function extractWorkflowRunParams(context) {
-  const {
-    payload
-  } = context;
-  const {
-    workflow_run: workflowRun
-  } = payload;
-  const commit = workflowRun?.head_commit?.id;
-  const commitMessage = workflowRun?.head_commit?.message;
-  const pr = workflowRun.event === 'pull_request' ? workflowRun?.pull_requests?.[0]?.number : undefined;
-  let branch = workflowRun.head_branch;
-  // prefix branch with owner when the event is triggered by a fork
-  const headOwner = workflowRun?.head_repository?.owner?.login;
-  if (headOwner && headOwner !== payload?.repository?.owner?.login) {
-    branch = `${headOwner}:${branch}`;
-  }
-  return {
-    commit,
-    commitMessage,
-    branch,
-    pr
-  };
-}
 ;// ./index.ts
 
 
@@ -258,19 +162,16 @@ async function run() {
     if (debug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }
-    // Extract env data
-    let agentParams;
-    if (eventName === 'pull_request') {
-      logger.debug('Extract params for pull_request flow');
-      agentParams = await extractPullRequestParams(github_namespaceObject.context, token, includeCommitMessage);
-    } else if (eventName === 'workflow_run') {
-      logger.debug('Extract params for workflow_run flow');
-      agentParams = await extractWorkflowRunParams(github_namespaceObject.context);
-    } else {
-      logger.debug('Extract params for default flow');
-      agentParams = extractParams(github_namespaceObject.context);
-    }
-    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`);
+    // Extract params
+    process.env.RELATIVE_CI_KEY = key;
+    process.env.RELATIVE_CI_SLUG = slug;
+    process.env.RELATIVE_CI_ENDPOINT = endpoint;
+    const params = env_default()({
+      agentType: 'github-action'
+    }, {
+      includeCommitMessage
+    });
+    logger.debug(`Agent params: ${JSON.stringify(params)}`);
     /**
      * Read JSON from the current job or download it from another job's artifact
      */
@@ -286,13 +187,6 @@ async function run() {
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
     (0,artifacts_namespaceObject.validateWebpackStats)(webpackStats);
-    // Extract params
-    process.env.RELATIVE_CI_KEY = key;
-    process.env.RELATIVE_CI_SLUG = slug;
-    process.env.RELATIVE_CI_ENDPOINT = endpoint;
-    const params = (0,utils_namespaceObject.normalizeParams)(agentParams, {
-      includeCommitMessage
-    });
     // Filter artifacts
     const data = (0,artifacts_namespaceObject.filterArtifacts)([{
       key: 'webpack.stats',
