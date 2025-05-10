@@ -4,12 +4,12 @@ branding:
   icon: 'box'
   color: 'blue'
 inputs:
-  token: 
-    description: GitHub token
-    required: true
   key:
     description: 'RelativeCI project API key'
     required: true
+  token: 
+    description: GitHub token
+    required: false
   webpackStatsFile:
     description: 'Path to your local bundle stats file'
     required: false
