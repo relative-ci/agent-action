@@ -7,7 +7,6 @@ import { logResponse } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { getSummary, logger } from './utils';
-import { AgentParams } from './types';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
