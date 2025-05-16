@@ -35,7 +35,7 @@ async function run() {
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
 
-    const params = loadEnv({ agentType: 'github-action' }, { includeCommitMessage });
+    const params = await loadEnv({ agentType: 'github-action' }, { includeCommitMessage });
 
     logger.debug(`Agent params: ${JSON.stringify(params)}`);
 
