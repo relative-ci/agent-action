@@ -166,7 +166,7 @@ async function run() {
     process.env.RELATIVE_CI_KEY = key;
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
-    const params = env_default()({
+    const params = await env_default()({
       agentType: 'github-action'
     }, {
       includeCommitMessage
