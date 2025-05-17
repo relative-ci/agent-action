@@ -154,12 +154,12 @@ async function run() {
     const includeCommitMessage = core_namespaceObject.getInput('includeCommitMessage') === 'true';
     const webpackStatsFile = core_namespaceObject.getInput('webpackStatsFile');
     const artifactName = core_namespaceObject.getInput('artifactName');
-    const debug = core_namespaceObject.getInput('debug') === 'true';
+    const showDebug = core_namespaceObject.getInput('debug') === 'true';
     const {
       eventName
     } = github_namespaceObject.context;
     // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
-    if (debug || ACTIONS_STEP_DEBUG) {
+    if (showDebug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }
     // Add inputs to process env
@@ -172,7 +172,7 @@ async function run() {
     }, {
       includeCommitMessage
     });
-    logger.debug(`Agent params: ${JSON.stringify(params)}`);
+    (0,utils_namespaceObject.debug)(`Agent params: ${JSON.stringify(params)}`);
     /**
      * Read JSON from the current job or download it from another job's artifact
      */
