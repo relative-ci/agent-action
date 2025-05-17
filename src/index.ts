@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 import ingest from '@relative-ci/core/ingest';
 import { filterArtifacts, validateWebpackStats } from '@relative-ci/core/artifacts';
 import loadEnv from '@relative-ci/core/env';
-import { logResponse, debug } from '@relative-ci/core/utils';
+import { AGENT_DEBUG_NAME, logResponse, debug } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { getSummary, logger } from './utils';
@@ -25,9 +25,9 @@ async function run() {
 
     const { eventName } = github.context;
 
-    // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
+    // Enable debugging when debug input or ACTIONS_STEP_DEBUG is set
     if (showDebug || ACTIONS_STEP_DEBUG) {
-      process.env.DEBUG = 'relative-ci:agent';
+      process.env.DEBUG = AGENT_DEBUG_NAME;
     }
 
     // Add inputs to process env
