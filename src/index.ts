@@ -55,6 +55,10 @@ async function run() {
         throw new Error('`webpackStatsFile` input is required!');
       }
 
+      if (!GITHUB_WORKSPACE) {
+        throw new Error('GITHUB_WORKSPACE environment variable is missing!');
+      }
+
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
 
@@ -68,15 +72,15 @@ async function run() {
 
     // Output summary
     const summary = getSummary({
-      title: response.info.message.txt,
-      url: response.reportUrl,
+      title: response?.info?.message?.txt || '',
+      url: response.reportUrl || '',
     });
 
     await core.summary.addRaw(summary).write();
 
     logResponse(response, logger);
   } catch (error) {
-    core.setFailed(error);
+    core.setFailed(error as Error);
   }
 }
 

@@ -1,12 +1,9 @@
 {
+  "extends": "@tsconfig/node20/tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "lib": ["es2024"],
     "sourceMap": true,
     "noImplicitAny": true,
-    "allowJs": true,
-    "module": "esnext",
-    "moduleResolution": "bundler",
-    "target": "esnext"
+    "allowJs": true
   }
 }
