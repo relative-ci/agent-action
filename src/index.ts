@@ -21,12 +21,12 @@ async function run() {
 
     const webpackStatsFile = core.getInput('webpackStatsFile');
     const artifactName = core.getInput('artifactName');
-    const debug = core.getInput('debug') === 'true';
+    const showDebug = core.getInput('debug') === 'true';
 
     const { eventName } = github.context;
 
     // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
-    if (debug || ACTIONS_STEP_DEBUG) {
+    if (showDebug || ACTIONS_STEP_DEBUG) {
       process.env.DEBUG = 'relative-ci:agent';
     }
 
