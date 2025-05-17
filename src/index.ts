@@ -3,7 +3,7 @@ import * as github from '@actions/github';
 import ingest from '@relative-ci/core/ingest';
 import { filterArtifacts, validateWebpackStats } from '@relative-ci/core/artifacts';
 import loadEnv from '@relative-ci/core/env';
-import { logResponse } from '@relative-ci/core/utils';
+import { logResponse, debug } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
 import { getSummary, logger } from './utils';
@@ -38,7 +38,7 @@ async function run() {
 
     const params = await loadEnv({ agentType: 'github-action' }, { includeCommitMessage });
 
-    logger.debug(`Agent params: ${JSON.stringify(params)}`);
+    debug(`Agent params: ${JSON.stringify(params)}`);
 
     /**
      * Read JSON from the current job or download it from another job's artifact
