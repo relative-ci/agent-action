@@ -30,7 +30,7 @@ async function run() {
       process.env.DEBUG = 'relative-ci:agent';
     }
 
-    // Extract params
+    // Add inputs to process env
     process.env.RELATIVE_CI_KEY = key;
     process.env.RELATIVE_CI_SLUG = slug;
     process.env.RELATIVE_CI_ENDPOINT = endpoint;
