@@ -18,7 +18,6 @@ GitHub action that sends bundle stats and CI build information to [RelativeCI](h
 2. [Inputs](#inputs)
 3. [Secrets](#secrets)
 
-
 ## Usage
 
 [View action.yml](./action.yml)
@@ -50,8 +49,8 @@ jobs:
       # Learn more: https://relative-ci.com/documentation/setup/agent/github-action#step-1-output-bundle-stats-json-file
       - run: npm run build -- --json webpack-stats.json
       
-      - name: Send bundle stats to RelativeCI
-        uses: relative-ci/agent-action@v2
+      - name: Send bundle stats and build information to RelativeCI
+        uses: relative-ci/agent-action@v3.0.0-beta
         with:
           key: ${{ secrets.RELATIVE_CI_KEY }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -116,7 +115,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Send bundle stats and build information to RelativeCI
-        uses: relative-ci/agent-action@v2
+        uses: relative-ci/agent-action@v3.0.0-beta
         with:
           key: ${{ secrets.RELATIVE_CI_KEY }}
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -130,11 +129,13 @@ jobs:
 
 ### `token`
 
-**Required** GitHub token
+Required only when running during `workflow_run` to download the bundle stats artifacts 
+GitHub API key
 
 ### `webpackStatsFile`
 
-**Required** (only when running during `push` or `pull_request` events) Path to the bundle stats file
+Required  when running during `push` or `pull_request` events
+Path to the bundle stats file
 
 ### Optional
 

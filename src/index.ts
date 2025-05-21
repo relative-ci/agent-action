@@ -1,14 +1,12 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import ingest from '@relative-ci/agent/ingest';
-import { filterArtifacts, validateWebpackStats } from '@relative-ci/agent/artifacts';
-import { logResponse, normalizeParams } from '@relative-ci/agent/utils';
+import ingest from '@relative-ci/core/ingest';
+import { filterArtifacts, validateWebpackStats } from '@relative-ci/core/artifacts';
+import loadEnv from '@relative-ci/core/env';
+import { AGENT_DEBUG_NAME, logResponse, debug } from '@relative-ci/core/utils';
 
 import { getWebpackStatsFromFile, getWebpackStatsFromArtifact } from './artifacts';
-import { extractParams, extractPullRequestParams, extractWorkflowRunParams } from './params';
 import { getSummary, logger } from './utils';
-import { AgentParams } from './types';
-import { text } from 'stream/consumers';
 
 const { ACTIONS_STEP_DEBUG, GITHUB_WORKSPACE } = process.env;
 
@@ -23,30 +21,24 @@ async function run() {
 
     const webpackStatsFile = core.getInput('webpackStatsFile');
     const artifactName = core.getInput('artifactName');
-    const debug = core.getInput('debug') === 'true';
+    const showDebug = core.getInput('debug') === 'true';
 
     const { eventName } = github.context;
 
-    // Enable debugging for debug input or ACTIONS_STEP_DEBUG is set
-    if (debug || ACTIONS_STEP_DEBUG) {
-      process.env.DEBUG = 'relative-ci:agent';
+    // Enable debugging when debug input or ACTIONS_STEP_DEBUG is set
+    if (showDebug || ACTIONS_STEP_DEBUG) {
+      process.env.DEBUG = AGENT_DEBUG_NAME;
     }
 
-    // Extract env data
-    let agentParams: AgentParams;
+    // Add inputs to process env
+    process.env.RELATIVE_CI_KEY = key;
+    process.env.RELATIVE_CI_SLUG = slug;
+    process.env.RELATIVE_CI_ENDPOINT = endpoint;
+    process.env.GITHUB_TOKEN = token;
 
-    if (eventName === 'pull_request') {
-      logger.debug('Extract params for pull_request flow');
-      agentParams = await extractPullRequestParams(github.context, token, includeCommitMessage);
-    } else if (eventName === 'workflow_run') {
-      logger.debug('Extract params for workflow_run flow');
-      agentParams = await extractWorkflowRunParams(github.context);
-    } else {
-      logger.debug('Extract params for default flow');
-      agentParams = extractParams(github.context);
-    }
+    const params = await loadEnv({ agentType: 'github-action' }, { includeCommitMessage });
 
-    logger.debug(`Agent params: ${JSON.stringify(agentParams)}`);
+    debug(`Agent params: ${JSON.stringify(params)}`);
 
     /**
      * Read JSON from the current job or download it from another job's artifact
@@ -63,17 +55,14 @@ async function run() {
         throw new Error('`webpackStatsFile` input is required!');
       }
 
+      if (!GITHUB_WORKSPACE) {
+        throw new Error('GITHUB_WORKSPACE environment variable is missing!');
+      }
+
       webpackStats = await getWebpackStatsFromFile(GITHUB_WORKSPACE, webpackStatsFile);
     }
 
     validateWebpackStats(webpackStats);
-
-    // Extract params
-    process.env.RELATIVE_CI_KEY = key;
-    process.env.RELATIVE_CI_SLUG = slug;
-    process.env.RELATIVE_CI_ENDPOINT = endpoint;
-
-    const params = normalizeParams(agentParams, { includeCommitMessage });
 
     // Filter artifacts
     const data = filterArtifacts([{ key: 'webpack.stats', data: webpackStats }]);
@@ -83,15 +72,15 @@ async function run() {
 
     // Output summary
     const summary = getSummary({
-      title: response.info.message.txt,
-      url: response.reportUrl,
+      title: response?.info?.message?.txt || '',
+      url: response.reportUrl || '',
     });
 
     await core.summary.addRaw(summary).write();
 
     logResponse(response, logger);
   } catch (error) {
-    core.setFailed(error);
+    core.setFailed(error as Error);
   }
 }
 

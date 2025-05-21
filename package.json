@@ -36,7 +36,7 @@
     "@actions/core": "1.11.1",
     "@actions/github": "6.0.0",
     "@octokit/webhooks-definitions": "3.67.3",
-    "@relative-ci/agent": "4.3.0",
+    "@relative-ci/core": "5.0.0",
     "adm-zip": "0.5.16",
     "lodash": "4.17.21"
   },
@@ -44,7 +44,9 @@
     "@babel/core": "7.26.9",
     "@babel/eslint-parser": "7.26.8",
     "@babel/preset-env": "7.26.9",
+    "@tsconfig/node20": "^20.1.5",
     "@types/adm-zip": "0.5.7",
+    "@types/node": "^22.15.18",
     "babel-loader": "10.0.0",
     "core-js": "3.40.0",
     "encoding": "0.1.13",
