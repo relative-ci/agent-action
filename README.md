@@ -91,7 +91,7 @@ jobs:
 
       # Upload webpack-stats.json to use on relative-ci.yaml workflow
       - name: Upload bundle stats artifact
-        uses: relative-ci/agent-upload-artifact-action@v2
+        uses: relative-ci/agent-upload-artifact-action@v3
         with:
           webpackStatsFile: ./webpack-stats.json
 ```
