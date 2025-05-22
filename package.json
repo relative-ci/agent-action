@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "@actions/core": "1.11.1",
-    "@actions/github": "6.0.0",
+    "@actions/github": "6.0.1",
     "@octokit/webhooks-definitions": "3.67.3",
     "@relative-ci/core": "5.0.0",
     "adm-zip": "0.5.16",
