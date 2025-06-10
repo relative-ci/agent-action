@@ -48,7 +48,7 @@
     "@types/adm-zip": "0.5.7",
     "@types/node": "^22.15.30",
     "babel-loader": "10.0.0",
-    "core-js": "3.42.0",
+    "core-js": "3.43.0",
     "encoding": "0.1.13",
     "eslint": "8.57.0",
     "eslint-config-airbnb-base": "15.0.0",
