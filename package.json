@@ -44,7 +44,7 @@
     "@babel/core": "7.27.4",
     "@babel/eslint-parser": "7.27.5",
     "@babel/preset-env": "7.26.9",
-    "@tsconfig/node20": "^20.1.5",
+    "@tsconfig/node20": "^20.1.6",
     "@types/adm-zip": "0.5.7",
     "@types/node": "^22.15.30",
     "babel-loader": "10.0.0",
