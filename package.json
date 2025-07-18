@@ -43,7 +43,7 @@
   "devDependencies": {
     "@babel/core": "7.28.0",
     "@babel/eslint-parser": "7.27.5",
-    "@babel/preset-env": "7.27.2",
+    "@babel/preset-env": "7.28.0",
     "@tsconfig/node20": "^20.1.6",
     "@types/adm-zip": "0.5.7",
     "@types/node": "^24.0.10",
