@@ -50,7 +50,7 @@ jobs:
       - run: npm run build -- --json webpack-stats.json
       
       - name: Send bundle stats and build information to RelativeCI
-        uses: relative-ci/agent-action@v3.0.0-beta
+        uses: relative-ci/agent-action@v3
         with:
           key: ${{ secrets.RELATIVE_CI_KEY }}
           token: ${{ secrets.GITHUB_TOKEN }}
