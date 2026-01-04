@@ -2,15 +2,15 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ 23:
-/***/ ((module) => {
+/***/ 23
+(module) {
 
 module.exports = require("util");
 
-/***/ }),
+/***/ },
 
-/***/ 385:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ 385
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 
@@ -124,10 +124,10 @@ async function getWebpackStatsFromArtifact(token, inputArtifactName, inputArtifa
   return JSON.parse(webpackStats);
 }
 
-/***/ }),
+/***/ },
 
-/***/ 618:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ 618
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 
@@ -261,31 +261,31 @@ async function run() {
 }
 run();
 
-/***/ }),
+/***/ },
 
-/***/ 650:
-/***/ ((module) => {
+/***/ 650
+(module) {
 
 module.exports = require("adm-zip");
 
-/***/ }),
+/***/ },
 
-/***/ 659:
-/***/ ((module) => {
+/***/ 659
+(module) {
 
 module.exports = require("@actions/core");
 
-/***/ }),
+/***/ },
 
-/***/ 743:
-/***/ ((module) => {
+/***/ 743
+(module) {
 
 module.exports = require("@relative-ci/core/env");
 
-/***/ }),
+/***/ },
 
-/***/ 823:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ 823
+(__unused_webpack_module, exports, __webpack_require__) {
 
 
 
@@ -351,49 +351,49 @@ function getSummary({
   return output.join('\n\n');
 }
 
-/***/ }),
+/***/ },
 
-/***/ 831:
-/***/ ((module) => {
+/***/ 831
+(module) {
 
 module.exports = require("@actions/github");
 
-/***/ }),
+/***/ },
 
-/***/ 885:
-/***/ ((module) => {
+/***/ 885
+(module) {
 
 module.exports = require("@relative-ci/core/utils");
 
-/***/ }),
+/***/ },
 
-/***/ 896:
-/***/ ((module) => {
+/***/ 896
+(module) {
 
 module.exports = require("fs");
 
-/***/ }),
+/***/ },
 
-/***/ 923:
-/***/ ((module) => {
+/***/ 923
+(module) {
 
 module.exports = require("@relative-ci/core/artifacts");
 
-/***/ }),
+/***/ },
 
-/***/ 928:
-/***/ ((module) => {
+/***/ 928
+(module) {
 
 module.exports = require("path");
 
-/***/ }),
+/***/ },
 
-/***/ 956:
-/***/ ((module) => {
+/***/ 956
+(module) {
 
 module.exports = require("@relative-ci/core/ingest");
 
-/***/ })
+/***/ }
 
 /******/ 	});
 /************************************************************************/
