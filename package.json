@@ -47,7 +47,7 @@
     "@tsconfig/node20": "^20.1.9",
     "@types/adm-zip": "0.5.7",
     "@types/node": "^25.2.3",
-    "babel-loader": "10.0.0",
+    "babel-loader": "10.1.0",
     "core-js": "3.48.0",
     "encoding": "0.1.13",
     "eslint": "8.57.0",
