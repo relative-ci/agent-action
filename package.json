@@ -46,7 +46,7 @@
     "@babel/preset-env": "7.29.0",
     "@tsconfig/node20": "^20.1.9",
     "@types/adm-zip": "0.5.7",
-    "@types/node": "^25.2.3",
+    "@types/node": "^25.4.0",
     "babel-loader": "10.0.0",
     "core-js": "3.48.0",
     "encoding": "0.1.13",
