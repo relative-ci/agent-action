@@ -36,7 +36,7 @@
     "@actions/core": "3.0.0",
     "@actions/github": "9.0.0",
     "@octokit/webhooks-definitions": "3.67.3",
-    "@relative-ci/core": "5.3.0",
+    "@relative-ci/core": "5.3.1",
     "adm-zip": "0.5.16",
     "lodash": "4.17.23"
   },
