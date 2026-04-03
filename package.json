@@ -53,7 +53,7 @@
     "eslint": "8.57.0",
     "eslint-config-airbnb-base": "15.0.0",
     "supports-color": "10.2.2",
-    "ts-loader": "9.5.4",
+    "ts-loader": "9.5.7",
     "typescript": "5.9.3",
     "webpack": "5.105.4",
     "webpack-cli": "7.0.2",
