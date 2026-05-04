@@ -12,9 +12,14 @@ module.exports = {
     path: path.join(__dirname, 'dist'),
   },
   externalsPresets: { node: true },
-  externals: [nodeExternals()],
+  externals: [
+    nodeExternals({
+      allowlist: [/^@actions\//, /^@oktokit\//],
+    }),
+  ],
   resolve: {
     extensions: ['.ts', '.js', '.json'],
+    conditionNames: ['import', 'require', 'node', 'default'],
     mainFields: ['main'],
     fallback: {
       // and-zip electron check
