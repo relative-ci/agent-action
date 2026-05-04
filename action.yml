@@ -7,7 +7,7 @@ inputs:
   key:
     description: 'RelativeCI project API key'
     required: true
-  token: 
+  token:
     description: GitHub token
     required: false
   webpackStatsFile:
@@ -25,11 +25,11 @@ inputs:
     default: 'true'
   compress:
     description: 'Compress ingest data'
-    required: false,
+    required: false
     default: 'false'
   debug:
     description: 'Output debug info'
-    required: false,
+    required: false
     default: 'false'
   artifactName:
     description: 'GitHub action artifact name to download when running in workflow_run'
