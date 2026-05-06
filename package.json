@@ -42,7 +42,7 @@
     "@actions/github": "9.1.1",
     "@babel/core": "7.29.0",
     "@babel/eslint-parser": "7.28.6",
-    "@babel/preset-env": "7.29.3",
+    "@babel/preset-env": "7.29.5",
     "@octokit/webhooks-definitions": "3.67.3",
     "@tsconfig/node20": "^20.1.9",
     "@types/adm-zip": "0.5.8",
