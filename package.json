@@ -55,7 +55,7 @@
     "supports-color": "10.2.2",
     "ts-loader": "9.5.7",
     "typescript": "6.0.3",
-    "webpack": "5.106.2",
+    "webpack": "5.107.1",
     "webpack-cli": "7.0.2",
     "webpack-node-externals": "3.0.0"
   }
