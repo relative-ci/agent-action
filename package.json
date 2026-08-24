@@ -46,7 +46,7 @@
     "@octokit/webhooks-definitions": "3.67.3",
     "@tsconfig/node20": "^20.1.10",
     "@types/adm-zip": "0.5.8",
-    "@types/node": "^25.9.1",
+    "@types/node": "^26.2.0",
     "babel-loader": "10.1.1",
     "core-js": "3.50.0",
     "encoding": "0.1.13",
