@@ -7,6 +7,10 @@ updates:
     commit-message:
       prefix: "chore(deps)"
     target-branch: "update-dependencies"
+    groups:
+      babel:
+        patterns:
+          - "@babel/*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
