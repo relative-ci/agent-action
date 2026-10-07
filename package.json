@@ -40,9 +40,9 @@
   "devDependencies": {
     "@actions/core": "3.0.1",
     "@actions/github": "9.1.1",
-    "@babel/core": "7.29.7",
-    "@babel/eslint-parser": "7.29.9",
-    "@babel/preset-env": "7.29.7",
+    "@babel/core": "8.0.6",
+    "@babel/eslint-parser": "8.0.6",
+    "@babel/preset-env": "8.0.6",
     "@octokit/webhooks-definitions": "3.67.3",
     "@tsconfig/node20": "^20.1.10",
     "@types/adm-zip": "0.5.8",
