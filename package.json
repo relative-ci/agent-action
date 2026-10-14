@@ -45,7 +45,7 @@
     "@babel/preset-env": "7.29.7",
     "@octokit/webhooks-definitions": "3.67.3",
     "@tsconfig/node20": "^20.1.10",
-    "@types/adm-zip": "0.5.8",
+    "@types/adm-zip": "0.6.0",
     "@types/node": "^26.6.4",
     "babel-loader": "10.1.1",
     "core-js": "3.50.0",
