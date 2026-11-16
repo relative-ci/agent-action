@@ -44,7 +44,7 @@
     "@babel/eslint-parser": "7.29.9",
     "@babel/preset-env": "7.29.7",
     "@octokit/webhooks-definitions": "3.67.3",
-    "@tsconfig/node20": "^20.1.10",
+    "@tsconfig/node20": "^20.1.11",
     "@types/adm-zip": "0.6.0",
     "@types/node": "^26.6.6",
     "babel-loader": "10.1.1",
